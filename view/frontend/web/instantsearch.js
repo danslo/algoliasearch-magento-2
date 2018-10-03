@@ -80,7 +80,6 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			apiKey: algoliaConfig.apiKey,
 			indexName: algoliaConfig.indexName + '_products',
 			urlSync: {
-				useHash: true,
 				trackedParameters: algoliaConfig.instant.urlTrackedParameters
 			},
 			searchParameters: {
