@@ -9,6 +9,7 @@ use Magento\CatalogSearch\Helper\Data;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Ddl\Table;
+use Magento\Framework\Registry;
 use Magento\Framework\Search\Adapter\Mysql\Aggregation\Builder as AggregationBuilder;
 use Magento\Framework\Search\Adapter\Mysql\DocumentFactory;
 use Magento\Framework\Search\Adapter\Mysql\Mapper;
@@ -47,6 +48,9 @@ class Algolia implements AdapterInterface
     /** @var StoreManagerInterface */
     private $storeManager;
 
+    /** @var Registry */
+    private $registry;
+
     /** @var AlgoliaHelper */
     private $algoliaHelper;
 
@@ -65,6 +69,7 @@ class Algolia implements AdapterInterface
      * @param ConfigHelper $config
      * @param Data $catalogSearchHelper
      * @param StoreManagerInterface $storeManager
+     * @param Registry $registry
      * @param AlgoliaHelper $algoliaHelper
      * @param Http $request
      * @param DocumentFactory $documentFactory
@@ -78,6 +83,7 @@ class Algolia implements AdapterInterface
         ConfigHelper $config,
         Data $catalogSearchHelper,
         StoreManagerInterface $storeManager,
+        Registry $registry,
         AlgoliaHelper $algoliaHelper,
         Http $request,
         DocumentFactory $documentFactory
@@ -90,6 +96,7 @@ class Algolia implements AdapterInterface
         $this->config = $config;
         $this->catalogSearchHelper = $catalogSearchHelper;
         $this->storeManager = $storeManager;
+        $this->registry = $registry;
         $this->algoliaHelper = $algoliaHelper;
         $this->request = $request;
         $this->documentFactory = $documentFactory;
@@ -97,51 +104,78 @@ class Algolia implements AdapterInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @uses getAlgoliaDocument
      */
     public function query(RequestInterface $request)
     {
-        $useNative = false;
         $storeId = $this->storeManager->getStore()->getId();
+
+        if (!$this->isAllowed($storeId)
+            || !($this->isSearch() ||
+                $this->isReplaceCategory($storeId) ||
+                $this->isReplaceAdvancedSearch($storeId))
+        ) {
+            return $this->nativeQuery($request);
+        }
+
         $query = $this->catalogSearchHelper->getEscapedQueryText();
         $temporaryStorage = $this->temporaryStorageFactory->create();
         $documents = [];
         $table = null;
 
-        if ($this->isAllowed($storeId)
-            && ($this->isSearch() ||
-                $this->isReplaceCategory($storeId) ||
-                $this->isReplaceAdvancedSearch($storeId))
-        ) {
-            try {
-                $algoliaQuery = $query !== '__empty__' ? $query : '';
+        try {
+            $algoliaQuery = $query !== '__empty__' ? $query : '';
 
-                // If instant search is on, do not make a search query unless SEO request is set to 'Yes'
-                if (!$this->config->isInstantEnabled($storeId) || $this->config->makeSeoRequest($storeId)) {
-                    $documents = $this->algoliaHelper->getSearchResult($algoliaQuery, $storeId);
+            // If instant search is on, do not make a search query unless SEO request is set to 'Yes'
+            if (!$this->config->isInstantEnabled($storeId) || $this->config->makeSeoRequest($storeId)) {
+
+                $contextParams = [];
+
+                if ($this->isReplaceCategory($storeId)) {
+                    $category = $this->registry->registry('current_category');
+                    $page = !is_null($this->request->getParam('p')) ? $this->request->getParam('p') : 0;
+
+                    if ($category) {
+                        $contextParams = [
+                            'facetFilters' => [
+                                'categoryIds:' . $category->getEntityId(),
+                            ],
+                            'page' => $page
+                        ];
+                    }
                 }
 
-                $apiDocuments = array_map([$this, 'getAlgoliaDocument'], $documents);
-                $table = $temporaryStorage->storeApiDocuments($apiDocuments);
-            } catch (AlgoliaConnectionException $e) {
-                $useNative = true;
+                $documents = $this->algoliaHelper->getSearchResult($algoliaQuery, $storeId, $contextParams);
             }
-        } else {
-            $useNative = true;
+
+            $apiDocuments = array_map(array($this, 'getAlgoliaDocument'), $documents);
+            $table = $temporaryStorage->storeApiDocuments($apiDocuments);
+
+        } catch (AlgoliaConnectionException $e) {
+            $this->nativeQuery($request);
         }
 
-        if ($useNative) {
-            $nativeQueryData = $this->getNativeQueryData($request);
-            $documents = $nativeQueryData['documents'];
-            $table = $nativeQueryData['table'];
-        }
-
+        $aggregations = $this->aggregationBuilder->build($request, $table, $documents);
         $response = [
             'documents' => $documents,
-            'aggregations' => $this->aggregationBuilder->build($request, $table, $documents),
+            'aggregations' => $aggregations,
         ];
 
+        return $this->responseFactory->create($response);
+    }
+
+    private function nativeQuery(RequestInterface $request)
+    {
+        $query = $this->mapper->buildQuery($request);
+        $temporaryStorage = $this->temporaryStorageFactory->create();
+        $table = $temporaryStorage->storeDocumentsFromSelect($query);
+
+        $documents = $this->getDocuments($table);
+
+        $aggregations = $this->aggregationBuilder->build($request, $table, $documents);
+        $response = [
+            'documents' => $documents,
+            'aggregations' => $aggregations,
+        ];
         return $this->responseFactory->create($response);
     }
 
@@ -151,29 +185,9 @@ class Algolia implements AdapterInterface
     }
 
     /**
-     * Get native query documents
-     *
-     * @param  RequestInterface $request
-     *
-     * @return array
-     */
-    public function getNativeQueryData($request)
-    {
-        $query  = $this->mapper->buildQuery($request);
-        $temporaryStorage = $this->temporaryStorageFactory->create();
-        $table = $temporaryStorage->storeDocumentsFromSelect($query);
-        $documents = $this->getDocuments($table);
-
-        return [
-            'documents' => $documents,
-            'table' => $table,
-        ];
-    }
-
-    /**
      * Checks if Algolia is properly configured and enabled
      *
-     * @param  int     $storeId
+     * @param int $storeId
      *
      * @return bool
      */
