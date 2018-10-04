@@ -79,9 +79,9 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			appId: algoliaConfig.applicationId,
 			apiKey: algoliaConfig.apiKey,
 			indexName: algoliaConfig.indexName + '_products',
-			urlSync: {
-				trackedParameters: algoliaConfig.instant.urlTrackedParameters
-			},
+			// urlSync: {
+			// 	trackedParameters: algoliaConfig.instant.urlTrackedParameters
+			// },
 			searchParameters: {
 				hitsPerPage: algoliaConfig.hitsPerPage,
 				ruleContexts: ruleContexts
@@ -95,6 +95,31 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 					$('.algolia-instant-replaced-content').hide();
 					$('.algolia-instant-selector-results').show();
 				}
+			},
+			routing : {
+        stateMapping: {
+          stateToRoute(uiState) {
+            return {
+              query: uiState.query,
+              // we use the character ~ as it is one that is rarely present in data and renders well in urls
+              color:
+              (uiState.refinementList &&
+                uiState.refinementList.color &&
+                uiState.refinementList.color.join('~')) ||
+              'all',
+              page: uiState.page
+            };
+          },
+          routeToState(routeState) {
+            return {
+              query: routeState.query,
+              refinementList: {
+                color: routeState.color && routeState.color.split('~')
+              },
+              page: routeState.page
+            };
+          }
+        }
 			}
 		};
 		
