@@ -99,25 +99,35 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 			routing : {
         stateMapping: {
           stateToRoute(uiState) {
-            return {
-              query: uiState.query,
-              // we use the character ~ as it is one that is rarely present in data and renders well in urls
-              color:
-              (uiState.refinementList &&
-                uiState.refinementList.color &&
-                uiState.refinementList.color.join('~')) ||
-              'all',
-              page: uiState.page
-            };
+            let map = {};
+            map['q'] = uiState.query;
+            if (algoliaConfig.facets) {
+              for(let i=0; i<algoliaConfig.facets.length; i++) {
+								let currentFacet = algoliaConfig.facets[i];
+								if (currentFacet.attribute != 'categories' && (currentFacet.type == 'conjunctive' || currentFacet.type == 'disjunctive')) {
+                  map[currentFacet.attribute] = (uiState.refinementList &&
+										uiState.refinementList[currentFacet.attribute] &&
+										uiState.refinementList[currentFacet.attribute].join('~'));
+                }
+							};
+            }
+            map['page'] = uiState.page;
+            return map;
           },
           routeToState(routeState) {
-            return {
-              query: routeState.query,
-              refinementList: {
-                color: routeState.color && routeState.color.split('~')
-              },
-              page: routeState.page
-            };
+            let map = {};
+            map['q'] = routeState.query;
+            map['refinementList'] = {};
+            if (algoliaConfig.facets) {
+              for(let i=0; i<algoliaConfig.facets.length; i++) {
+                let currentFacet = algoliaConfig.facets[i];
+                if (currentFacet.attribute != 'categories' && (currentFacet.type == 'conjunctive' || currentFacet.type == 'disjunctive')) {
+                  map['refinementList'][currentFacet.attribute] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute].split('~');
+                }
+              };
+            }
+            map['page'] = routeState.page;
+            return map;
           }
         }
 			}

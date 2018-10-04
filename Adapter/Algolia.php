@@ -132,7 +132,9 @@ class Algolia implements AdapterInterface
 
                 if ($this->isReplaceCategory($storeId)) {
                     $category = $this->registry->registry('current_category');
-                    $page = !is_null($this->request->getParam('p')) ? $this->request->getParam('p') : 0;
+                    $page = !is_null($this->request->getParam('page')) ?
+                        (int) $this->request->getParam('page') - 1 :
+                        0;
 
                     if ($category) {
                         $contextParams = [
