@@ -100,7 +100,11 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
         stateMapping: {
           stateToRoute(uiState) {
             let map = {};
-            map['q'] = uiState.query;
+            if (algoliaConfig.isCategoryPage) {
+              map['q'] = uiState.query;
+            } else {
+            	map['q'] = uiState.query || '__empty__';
+            }
             if (algoliaConfig.facets) {
               for(let i=0; i<algoliaConfig.facets.length; i++) {
 								let currentFacet = algoliaConfig.facets[i];
