@@ -130,9 +130,8 @@ class Algolia implements AdapterInterface
                 $documents = $this->getDocumentsFromAlgolia($algoliaQuery, $storeId);
             }
 
-            $apiDocuments = array_map(array($this, 'getApiDocument'), $documents);
+            $apiDocuments = array_map([$this, 'getApiDocument'], $documents);
             $table = $temporaryStorage->storeApiDocuments($apiDocuments);
-
         } catch (AlgoliaConnectionException $e) {
             $this->nativeQuery($request);
         }
@@ -159,6 +158,7 @@ class Algolia implements AdapterInterface
             'documents' => $documents,
             'aggregations' => $aggregations,
         ];
+
         return $this->responseFactory->create($response);
     }
 
@@ -210,7 +210,7 @@ class Algolia implements AdapterInterface
                 'facetFilters' => [
                     'categoryIds:' . $category->getEntityId(),
                 ],
-                'page' => $page
+                'page' => $page,
             ];
 
             $facetFilters = [];
@@ -243,7 +243,7 @@ class Algolia implements AdapterInterface
 
             // Handle price filtering
             $currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
-            $priceSliders[] = 'price_' .  $currencyCode . '_default';
+            $priceSliders[] = 'price_' . $currencyCode . '_default';
 
             if ($this->config->isCustomerGroupsEnabled($storeId)) {
                 $groupCollection = $this->objectManager

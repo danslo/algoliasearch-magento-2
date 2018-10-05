@@ -152,7 +152,7 @@ class Data
             'attributesToSnippet'    => '',
             'numericFilters'         => 'visibility_search=1',
             'removeWordsIfNoResults' => $this->configHelper->getRemoveWordsIfNoResult($storeId),
-            'analyticsTags'          => 'backend-search'
+            'analyticsTags'          => 'backend-search',
         ];
 
         if (is_array($contextParams)) {
