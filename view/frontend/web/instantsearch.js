@@ -104,13 +104,21 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
             if (algoliaConfig.facets) {
               for(let i=0; i<algoliaConfig.facets.length; i++) {
 								let currentFacet = algoliaConfig.facets[i];
+								// Handle refinement facets
 								if (currentFacet.attribute != 'categories' && (currentFacet.type == 'conjunctive' || currentFacet.type == 'disjunctive')) {
-                  map[currentFacet.attribute] = (uiState.refinementList &&
+									map[currentFacet.attribute] = (uiState.refinementList &&
 										uiState.refinementList[currentFacet.attribute] &&
 										uiState.refinementList[currentFacet.attribute].join('~'));
-                }
+								}
+                // Handle sliders
+								if (currentFacet.type == 'slider') {
+									map[currentFacet.attribute] = (uiState.range &&
+										uiState.range[currentFacet.attribute] &&
+										uiState.range[currentFacet.attribute]);
+								}
 							};
             }
+            map['sortBy'] = uiState.sortBy;
             map['page'] = uiState.page;
             return map;
           },
@@ -118,14 +126,21 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
             let map = {};
             map['q'] = routeState.query;
             map['refinementList'] = {};
+            map['range'] = {};
             if (algoliaConfig.facets) {
               for(let i=0; i<algoliaConfig.facets.length; i++) {
                 let currentFacet = algoliaConfig.facets[i];
+                // Handle refinement facets
                 if (currentFacet.attribute != 'categories' && (currentFacet.type == 'conjunctive' || currentFacet.type == 'disjunctive')) {
                   map['refinementList'][currentFacet.attribute] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute].split('~');
                 }
+                // Handle sliders
+                if (currentFacet.type == 'slider') {
+                  map['range'][currentFacet.attribute] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute];
+                }
               };
             }
+            map['sortBy'] = routeState.sortBy;
             map['page'] = routeState.page;
             return map;
           }

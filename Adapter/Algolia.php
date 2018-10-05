@@ -127,29 +127,10 @@ class Algolia implements AdapterInterface
 
             // If instant search is on, do not make a search query unless SEO request is set to 'Yes'
             if (!$this->config->isInstantEnabled($storeId) || $this->config->makeSeoRequest($storeId)) {
-
-                $contextParams = [];
-
-                if ($this->isReplaceCategory($storeId)) {
-                    $category = $this->registry->registry('current_category');
-                    $page = !is_null($this->request->getParam('page')) ?
-                        (int) $this->request->getParam('page') - 1 :
-                        0;
-
-                    if ($category) {
-                        $contextParams = [
-                            'facetFilters' => [
-                                'categoryIds:' . $category->getEntityId(),
-                            ],
-                            'page' => $page
-                        ];
-                    }
-                }
-
-                $documents = $this->algoliaHelper->getSearchResult($algoliaQuery, $storeId, $contextParams);
+                $documents = $this->getDocumentsFromAlgolia($algoliaQuery, $storeId);
             }
 
-            $apiDocuments = array_map(array($this, 'getAlgoliaDocument'), $documents);
+            $apiDocuments = array_map(array($this, 'getApiDocument'), $documents);
             $table = $temporaryStorage->storeApiDocuments($apiDocuments);
 
         } catch (AlgoliaConnectionException $e) {
@@ -181,9 +162,118 @@ class Algolia implements AdapterInterface
         return $this->responseFactory->create($response);
     }
 
-    private function getAlgoliaDocument($document)
+    private function getApiDocument($document)
     {
         return $this->documentFactory->create($document);
+    }
+
+    /**
+     * Get search result from Algolia
+     *
+     * @param string $algoliaQuery
+     * @param int $storeId
+     *
+     * @return array
+     */
+    private function getDocumentsFromAlgolia($algoliaQuery, $storeId)
+    {
+        $contextParams = [];
+        $targetedIndex = null;
+        if ($this->isReplaceCategory($storeId)) {
+            $contextParams = $this->getContextParams($storeId);
+
+            if (!is_null($this->request->getParam('sortBy'))) {
+                $targetedIndex = $this->request->getParam('sortBy');
+            }
+        }
+
+        return $this->algoliaHelper->getSearchResult($algoliaQuery, $storeId, $contextParams, $targetedIndex);
+    }
+
+    /**
+     * Get the contextual params from the url
+     *
+     * @param int $storeId
+     *
+     * @return array
+     */
+    private function getContextParams($storeId)
+    {
+        $contextParams = [];
+        $category = $this->registry->registry('current_category');
+        $page = !is_null($this->request->getParam('page')) ?
+            (int) $this->request->getParam('page') - 1 :
+            0;
+
+        if ($category) {
+            $contextParams = [
+                'facetFilters' => [
+                    'categoryIds:' . $category->getEntityId(),
+                ],
+                'page' => $page
+            ];
+
+            $facetFilters = [];
+
+            foreach ($this->config->getFacets($storeId) as $facet) {
+                if (!is_null($this->request->getParam($facet['attribute']))) {
+                    if ($facet['type'] === 'conjunctive') {
+                        $facetValues = explode('~', $this->request->getParam($facet['attribute']));
+                        foreach ($facetValues as $key => $facetValue) {
+                            $facetFilters[] = $facet['attribute'] . ':' . $facetValue;
+                        }
+                    }
+
+                    if ($facet['type'] === 'disjunctive') {
+                        $facetValues = explode('~', $this->request->getParam($facet['attribute']));
+                        if (count($facetValues) > 1) {
+                            foreach ($facetValues as $key => $facetValue) {
+                                $facetValues[$key] = $facet['attribute'] . ':' . $facetValue;
+                            }
+                            $facetFilters[] = $facetValues;
+                        }
+                        if (count($facetValues) == 1) {
+                            $facetFilters[] = $facet['attribute'] . ':' . $facetValues[0];
+                        }
+                    }
+                }
+            }
+
+            $contextParams['facetFilters'] = array_merge($contextParams['facetFilters'], $facetFilters);
+
+            // Handle price filtering
+            $currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
+            $priceSliders[] = 'price_' .  $currencyCode . '_default';
+
+            if ($this->config->isCustomerGroupsEnabled($storeId)) {
+                $groupCollection = $this->objectManager
+                    ->create('Magento\Customer\Model\ResourceModel\Group\Collection');
+
+                foreach ($groupCollection as $group) {
+                    $groupId = (int) $group->getData('customer_group_id');
+                    $priceSliders[] = 'price_' . $currencyCode . '_group_' . $groupId;
+                }
+            }
+
+            foreach ($priceSliders as $priceSlider) {
+                if (!is_null($this->request->getParam($priceSlider))) {
+                    $attribute = str_replace('_', '.', $priceSlider);
+                    $pricesFilter = $this->request->getParam($priceSlider);
+                    $prices = explode(':', $pricesFilter);
+
+                    if (count($prices) == 2) {
+                        if ($prices[0] != '') {
+                            $contextParams['numericFilters'][] = $attribute . '>=' . $prices[0];
+                        }
+                        if ($prices[1] != '') {
+                            $contextParams['numericFilters'][] = $attribute . '<=' . $prices[1];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $contextParams;
     }
 
     /**

@@ -134,9 +134,11 @@ class Data
         $this->setExtraSettings($storeId, $useTmpIndex);
     }
 
-    public function getSearchResult($query, $storeId, $contextParams = null)
+    public function getSearchResult($query, $storeId, $contextParams = null, $targetedIndex = null)
     {
-        $indexName = $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId);
+        $indexName = !is_null($targetedIndex) ?
+            $targetedIndex :
+            $this->getIndexName($this->productHelper->getIndexNameSuffix(), $storeId);
 
         $numberOfResults = 1000;
         if ($this->configHelper->isInstantEnabled()) {
