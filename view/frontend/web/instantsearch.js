@@ -118,12 +118,12 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 										uiState.refinementList[currentFacet.attribute] &&
 										uiState.refinementList[currentFacet.attribute].join('~'));
 								}
-                // Handle categories
-                if (currentFacet.attribute == 'categories' && !algoliaConfig.isCategoryPage) {
-                  map[currentFacet.attribute] = (uiState.hierarchicalMenu &&
-                    uiState.hierarchicalMenu[currentFacet.attribute+ '.level0'] &&
-                    uiState.hierarchicalMenu[currentFacet.attribute+ '.level0'].join('~'));
-                }
+								// Handle categories
+								if (currentFacet.attribute == 'categories' && !algoliaConfig.isCategoryPage) {
+									map[currentFacet.attribute] = (uiState.hierarchicalMenu &&
+										uiState.hierarchicalMenu[currentFacet.attribute+ '.level0'] &&
+										uiState.hierarchicalMenu[currentFacet.attribute+ '.level0'].join('~'));
+								}
 								// Handle sliders
 								if (currentFacet.type == 'slider') {
 									map[currentFacet.attribute] = (uiState.range &&
@@ -149,10 +149,10 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 								if (currentFacet.attribute != 'categories' && (currentFacet.type == 'conjunctive' || currentFacet.type == 'disjunctive')) {
 									map['refinementList'][currentFacet.attribute] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute].split('~');
 								}
-                // Handle categories facet
-                if (currentFacet.attribute == 'categories' && !algoliaConfig.isCategoryPage) {
-                  map['hierarchicalMenu'][currentFacet.attribute+ '.level0'] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute].split('~');
-                }
+								// Handle categories facet
+								if (currentFacet.attribute == 'categories' && !algoliaConfig.isCategoryPage) {
+									map['hierarchicalMenu'][currentFacet.attribute+ '.level0'] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute].split('~');
+								}
 								// Handle sliders
 								if (currentFacet.type == 'slider') {
 									map['range'][currentFacet.attribute] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute];
