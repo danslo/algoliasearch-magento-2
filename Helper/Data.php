@@ -134,7 +134,7 @@ class Data
         $this->setExtraSettings($storeId, $useTmpIndex);
     }
 
-    public function getSearchResult($query, $storeId, $contextParams = null, $targetedIndex = null)
+    public function getSearchResult($query, $storeId, $searchParams = null, $targetedIndex = null)
     {
         $indexName = !is_null($targetedIndex) ?
             $targetedIndex :
@@ -155,8 +155,8 @@ class Data
             'analyticsTags'          => 'backend-search',
         ];
 
-        if (is_array($contextParams)) {
-            $params = array_merge($params, $contextParams);
+        if (is_array($searchParams)) {
+            $params = array_merge($params, $searchParams);
         }
 
         $answer = $this->algoliaHelper->query($indexName, $query, $params);

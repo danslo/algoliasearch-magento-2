@@ -96,17 +96,21 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 					$('.algolia-instant-selector-results').show();
 				}
 			},
+			// The url is now rendered as follows : http://website.com?q=searchquery&facet1=value&facet2=value1~value2
+			// "?" and "&" are used to be fetched easily inside Magento for the backend rendering
+			// Multivalued facets use "~" as separator
+			// Targeted index is defined by sortBy parameter
 			routing : {
-        stateMapping: {
-          stateToRoute(uiState) {
-            let map = {};
-            if (algoliaConfig.isCategoryPage) {
-              map['q'] = uiState.query;
-            } else {
-            	map['q'] = uiState.query || '__empty__';
-            }
-            if (algoliaConfig.facets) {
-              for(let i=0; i<algoliaConfig.facets.length; i++) {
+				stateMapping: {
+					stateToRoute(uiState) {
+						let map = {};
+						if (algoliaConfig.isCategoryPage) {
+							map['q'] = uiState.query;
+						} else {
+							map['q'] = uiState.query || '__empty__';
+						}
+						if (algoliaConfig.facets) {
+							for(let i=0; i<algoliaConfig.facets.length; i++) {
 								let currentFacet = algoliaConfig.facets[i];
 								// Handle refinement facets
 								if (currentFacet.attribute != 'categories' && (currentFacet.type == 'conjunctive' || currentFacet.type == 'disjunctive')) {
@@ -114,41 +118,52 @@ requirejs(['algoliaBundle','Magento_Catalog/js/price-utils'], function(algoliaBu
 										uiState.refinementList[currentFacet.attribute] &&
 										uiState.refinementList[currentFacet.attribute].join('~'));
 								}
-                // Handle sliders
+                // Handle categories
+                if (currentFacet.attribute == 'categories' && !algoliaConfig.isCategoryPage) {
+                  map[currentFacet.attribute] = (uiState.hierarchicalMenu &&
+                    uiState.hierarchicalMenu[currentFacet.attribute+ '.level0'] &&
+                    uiState.hierarchicalMenu[currentFacet.attribute+ '.level0'].join('~'));
+                }
+								// Handle sliders
 								if (currentFacet.type == 'slider') {
 									map[currentFacet.attribute] = (uiState.range &&
 										uiState.range[currentFacet.attribute] &&
 										uiState.range[currentFacet.attribute]);
 								}
 							};
-            }
-            map['sortBy'] = uiState.sortBy;
-            map['page'] = uiState.page;
-            return map;
-          },
-          routeToState(routeState) {
-            let map = {};
-            map['q'] = routeState.query;
-            map['refinementList'] = {};
-            map['range'] = {};
-            if (algoliaConfig.facets) {
-              for(let i=0; i<algoliaConfig.facets.length; i++) {
-                let currentFacet = algoliaConfig.facets[i];
-                // Handle refinement facets
-                if (currentFacet.attribute != 'categories' && (currentFacet.type == 'conjunctive' || currentFacet.type == 'disjunctive')) {
-                  map['refinementList'][currentFacet.attribute] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute].split('~');
+						}
+						map['sortBy'] = uiState.sortBy;
+						map['page'] = uiState.page;
+						return map;
+					},
+					routeToState(routeState) {
+						let map = {};
+						map['query'] = routeState.q == '__empty__' ? '' : routeState.q;
+						map['refinementList'] = {};
+						map['hierarchicalMenu'] = {};
+						map['range'] = {};
+						if (algoliaConfig.facets) {
+							for(let i=0; i<algoliaConfig.facets.length; i++) {
+								let currentFacet = algoliaConfig.facets[i];
+								// Handle refinement facets
+								if (currentFacet.attribute != 'categories' && (currentFacet.type == 'conjunctive' || currentFacet.type == 'disjunctive')) {
+									map['refinementList'][currentFacet.attribute] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute].split('~');
+								}
+                // Handle categories facet
+                if (currentFacet.attribute == 'categories' && !algoliaConfig.isCategoryPage) {
+                  map['hierarchicalMenu'][currentFacet.attribute+ '.level0'] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute].split('~');
                 }
-                // Handle sliders
-                if (currentFacet.type == 'slider') {
-                  map['range'][currentFacet.attribute] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute];
-                }
-              };
-            }
-            map['sortBy'] = routeState.sortBy;
-            map['page'] = routeState.page;
-            return map;
-          }
-        }
+								// Handle sliders
+								if (currentFacet.type == 'slider') {
+									map['range'][currentFacet.attribute] = routeState[currentFacet.attribute] && routeState[currentFacet.attribute];
+								}
+							};
+						}
+						map['sortBy'] = routeState.sortBy;
+						map['page'] = routeState.page;
+						return map;
+					}
+				}
 			}
 		};
 		
