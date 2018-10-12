@@ -230,7 +230,7 @@ class Algolia implements AdapterInterface
                 explode('~', $this->request->getParam($facet['attribute']));
 
             if ($facet['attribute'] == 'categories') {
-                $level = ".level" . (count($facetValues) - 1);
+                $level = '.level' . (count($facetValues) - 1);
                 $facetFilters[] = $facet['attribute'] . $level . ':' . implode(' /// ', $facetValues);
                 continue;
             }

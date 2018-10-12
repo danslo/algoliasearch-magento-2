@@ -31,10 +31,11 @@ class RenderingCacheContextPlugin
     public function beforeGetVaryString(HttpContext $subject)
     {
         $context = $this->configHelper->preventBackendRendering() ?
-            self::RENDERING_WITHOUT_BACKEND:
+            self::RENDERING_WITHOUT_BACKEND :
             self::RENDERING_WITH_BACKEND;
 
         $subject->setValue(self::RENDERING_CONTEXT, $context, self::RENDERING_WITH_BACKEND);
+
         return [];
     }
 }
