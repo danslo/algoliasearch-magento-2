@@ -1037,7 +1037,7 @@ class ProductHelper
                 'hitsPerPage' => $hitsPerPage,
             ]);
 
-            if (!array_key_exists('hits', $fetchedQueryRules)) {
+            if (!$fetchedQueryRules || !array_key_exists('hits', $fetchedQueryRules)) {
                 break;
             }
 
