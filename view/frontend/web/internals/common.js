@@ -362,7 +362,7 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					var isCategoryFacetEnabled = false;
 					for (var i=0; i<algoliaConfig.facets.length; i++) {
 						if (algoliaConfig.facets[i].attribute == "categories") {
-              isCategoryFacetEnabled = true;
+							isCategoryFacetEnabled = true;
 						}
 					}
 
