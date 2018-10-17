@@ -367,14 +367,14 @@ requirejs(['algoliaBundle'], function(algoliaBundle) {
 					}
 
 					if (isCategoryFacetEnabled) {
-            if (keys.length > 0) {
-              ors += '<span><a href="' + keys[0].url + '">' + keys[0].key + '</a></span>';
-            }
+						if (keys.length > 0) {
+							ors += '<span><a href="' + keys[0].url + '">' + keys[0].key + '</a></span>';
+						}
 
-            if (keys.length > 1) {
-              ors += ', <span><a href="' + keys[1].url + '">' + keys[1].key + '</a></span>';
-            }
-          }
+						if (keys.length > 1) {
+							ors += ', <span><a href="' + keys[1].url + '">' + keys[1].key + '</a></span>';
+						}
+					}
 
 					var allUrl = algoliaConfig.baseUrl + '/catalogsearch/result/?q=' + encodeURIComponent(query.query);
 					var returnFooter = '<div id="autocomplete-products-footer">' + algoliaConfig.translations.seeIn + ' <span><a href="' + allUrl +  '">' + algoliaConfig.translations.allDepartments + '</a></span> (' + content.nbHits + ')';
