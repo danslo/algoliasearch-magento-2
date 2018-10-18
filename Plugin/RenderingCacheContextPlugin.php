@@ -4,6 +4,8 @@ namespace Algolia\AlgoliaSearch\Plugin;
 
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Magento\Framework\App\Http\Context as HttpContext;
+use Magento\Framework\App\Request\Http;
+use Magento\Store\Model\StoreManagerInterface;
 
 class RenderingCacheContextPlugin
 {
@@ -12,11 +14,17 @@ class RenderingCacheContextPlugin
     const RENDERING_WITHOUT_BACKEND = 'without_backend';
 
     private $configHelper;
+    private $storeManager;
+    private $request;
 
     public function __construct(
-        ConfigHelper $configHelper
+        ConfigHelper $configHelper,
+        StoreManagerInterface $storeManager,
+        Http $request
     ) {
         $this->configHelper = $configHelper;
+        $this->storeManager = $storeManager;
+        $this->request = $request;
     }
 
     /**
@@ -30,6 +38,12 @@ class RenderingCacheContextPlugin
      */
     public function beforeGetVaryString(HttpContext $subject)
     {
+        $storeId = $this->storeManager->getStore()->getId();
+        if (! ($this->request->getControllerName() === 'category'
+                && $this->configHelper->replaceCategories($storeId) === true)) {
+            return [];
+        }
+
         $context = $this->configHelper->preventBackendRendering() ?
             self::RENDERING_WITHOUT_BACKEND :
             self::RENDERING_WITH_BACKEND;
