@@ -76,9 +76,13 @@ class Index extends Template
         return $this->dataHelper->getIndexName($this->productHelper->getIndexNameSuffix(), $this->getStore()->getId());
     }
 
+    /**
+     * @return array
+     */
     public function getTopSearches()
     {
-        return $this->analyticsHelper->getTopSearches(['index' => $this->getIndexName()]);
+        $topSearches = $this->analyticsHelper->getTopSearches(['index' => $this->getIndexName()]);
+        return isset($topSearches['searches']) ? $topSearches['searches'] : array();
     }
 
     /**

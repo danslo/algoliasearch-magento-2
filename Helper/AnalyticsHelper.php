@@ -2,7 +2,7 @@
 
 namespace Algolia\AlgoliaSearch\Helper;
 
-use AlgoliaHelper;
+use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use AlgoliaSearch\Analytics;
 use AlgoliaSearch\Version;
 

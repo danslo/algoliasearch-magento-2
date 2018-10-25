@@ -1,2 +1,28 @@
 <?php /** @var $this \Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Index */ ?>
-<?php print_r($this->getTopSearches()); ?>
+<div class="row">
+    <div class="one-third popular-searches">
+        <div class="title">
+            <?php echo __('Popular Searches'); ?>
+            <?php if (count($this->getTopSearches())): ?>
+                <table>
+                    <thead>
+                        <tr>
+                            <th><?php echo __('Query') ?></th>
+                            <th><?php echo __('Count') ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($this->getTopSearches() as $search): ?>
+                        <tr>
+                            <td><?php echo $search['search'] ?></td>
+                            <td><?php echo $search['count'] ?></td>
+                        </tr>
+                        <?php endforeach ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <?php echo __('No searches yet!'); ?>
+            <?php endif ?>
+        </div>
+    </div>
+</div>
