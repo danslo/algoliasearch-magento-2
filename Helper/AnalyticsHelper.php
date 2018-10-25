@@ -12,9 +12,6 @@ class AnalyticsHelper extends Analytics
     const ANALYTICS_HITS_PATH = '/2/hits';
     const ANALTYICS_FILTER_PATH = '/2/filters';
 
-    /** @var Analytics */
-    private $analytics;
-
     /** @var \Algolia\AlgoliaSearch\Helper\AlgoliaHelper */
     private $algoliaHelper;
 
@@ -117,11 +114,6 @@ class AnalyticsHelper extends Analytics
      */
     protected function _call($path, array $params)
     {
-        // backward compatibility
-        if (Version::get() < 2.0) {
-            return $this->request('GET', $path, $params);
-        }
-
-        return $this->custom('GET', $path, $params);
+        return $this->request('GET', $path, $params);
     }
 }

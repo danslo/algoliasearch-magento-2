@@ -36,8 +36,15 @@ class Index extends Template
     private $productHelper;
 
     /**
+     * Index constructor.
      * @param Context $context
+     * @param AlgoliaHelper $algoliaHelper
      * @param DateTime $dateTime
+     * @param ObjectManagerInterface $objectManager
+     * @param ConfigHelper $configHelper
+     * @param AnalyticsHelper $analyticsHelper
+     * @param ProductHelper $productHelper
+     * @param Data $dataHelper
      * @param array $data
      */
     public function __construct(
