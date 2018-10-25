@@ -27,4 +27,31 @@
             <?php endif ?>
         </div>
     </div>
+    <div class="one-third popular-results">
+        <div class="title">
+            <?php echo __('Popular Results'); ?>
+        </div>
+        <div class="analytics-content">
+            <?php if (count($this->getTopHits())): ?>
+                <table>
+                    <thead>
+                    <tr>
+                        <th><?php echo __('Query') ?></th>
+                        <th><?php echo __('Count') ?></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($this->getTopHits() as $hit): ?>
+                        <tr>
+                            <td><?php echo $hit['hit'] ?></td>
+                            <td><?php echo $hit['count'] ?></td>
+                        </tr>
+                    <?php endforeach ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <?php echo __('No hits yet!'); ?>
+            <?php endif ?>
+        </div>
+    </div>
 </div>
