@@ -7,21 +7,20 @@ use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\AnalyticsHelper;
 use Algolia\AlgoliaSearch\Helper\Data;
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
-use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Stdlib\DateTime\DateTime;
-use Magento\Framework\View\Element\Template;
-use Magento\Framework\View\Element\Template\Context;
+use Magento\Backend\Block\Template;
+use Magento\Backend\Block\Template\Context;
 
 class Index extends Template
 {
+    /** @var Context */
+    private $backendContext;
+
     /** @var DateTime */
     private $dateTime;
 
     /** @var AlgoliaHelper */
     private $algoliaHelper;
-
-    /** @var ObjectManagerInterface */
-    private $objectManger;
 
     /** @var ConfigHelper */
     private $configHelper;
@@ -40,7 +39,6 @@ class Index extends Template
      * @param Context $context
      * @param AlgoliaHelper $algoliaHelper
      * @param DateTime $dateTime
-     * @param ObjectManagerInterface $objectManager
      * @param ConfigHelper $configHelper
      * @param AnalyticsHelper $analyticsHelper
      * @param ProductHelper $productHelper
@@ -51,7 +49,6 @@ class Index extends Template
         Context $context,
         AlgoliaHelper $algoliaHelper,
         DateTime $dateTime,
-        ObjectManagerInterface $objectManager,
         ConfigHelper $configHelper,
         AnalyticsHelper $analyticsHelper,
         ProductHelper $productHelper,
@@ -59,9 +56,10 @@ class Index extends Template
         array $data = []
     ) {
         parent::__construct($context, $data);
+
+        $this->backendContext = $context;
         $this->dateTime = $dateTime;
         $this->algoliaHelper = $algoliaHelper;
-        $this->objectManger = $objectManager;
         $this->configHelper = $configHelper;
         $this->dataHelper = $dataHelper;
         $this->productHelper = $productHelper;
@@ -104,7 +102,7 @@ class Index extends Template
      */
     public function getStore()
     {
-        $storeManager = $this->objectManger->get('Magento\Store\Model\StoreManagerInterface');
+        $storeManager = $this->backendContext->getStoreManager();
         if ($storeId = $this->getRequest()->getParam('store')) {
             return $storeManager->getStore($storeId);
         }

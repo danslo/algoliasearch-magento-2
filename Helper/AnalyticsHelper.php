@@ -15,10 +15,15 @@ class AnalyticsHelper extends Analytics
     /** @var \Algolia\AlgoliaSearch\Helper\AlgoliaHelper */
     private $algoliaHelper;
 
+    private $logger;
+
     public function __construct(
-        AlgoliaHelper $algoliaHelper
+        AlgoliaHelper $algoliaHelper,
+        Logger $logger
     ) {
         $this->algoliaHelper = $algoliaHelper;
+        $this->logger = $logger;
+
         parent::__construct($algoliaHelper->getClient());
     }
 
@@ -116,6 +121,20 @@ class AnalyticsHelper extends Analytics
      */
     protected function fetch($path, array $params)
     {
-        return $this->request('GET', $path, $params);
+        $response = false;
+
+        try {
+            // analytics api requires index name for all calls
+            if (!isset($params['index'])) {
+                throw new \Exception('Analytics API requires index name.');
+            }
+
+            $response = $this->request('GET', $path, $params);
+
+        } catch (\Exception $e) {
+            $this->logger->log($e->getMessage());
+        }
+
+        return $response;
     }
 }
