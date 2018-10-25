@@ -76,16 +76,27 @@ class Index extends Template
         return $this->dataHelper->getIndexName($this->productHelper->getIndexNameSuffix(), $this->getStore()->getId());
     }
 
-    public function getTopSearches()
+    /**
+     * @param array $additional
+     * @return array
+     */
+    public function getAnalyticsParams($additional = array())
     {
-        $topSearches = $this->analyticsHelper->getTopSearches(['index' => $this->getIndexName()]);
-        return isset($topSearches['searches']) ? $topSearches['searches'] : array();
+        // add startDate and endDate optional parameters
+        $params = array('index' => $this->getIndexName());
+        return array_merge($params, $additional);
     }
 
-    public function getTopHits()
+    public function getTopSearches()
     {
-        $topHits = $this->analyticsHelper->getTopHits(['index' => $this->getIndexName()]);
-        return isset($topHits['hits']) ? $topHits['hits'] : array();
+        $topSearches = $this->analyticsHelper->getTopSearches($this->getAnalyticsParams());
+        return isset($topSearches['searches']) ? array_slice($topSearches['searches'], 0, 5) : array();
+    }
+
+    public function getNoResultSearches()
+    {
+        $noResults = $this->analyticsHelper->getTopSearchesNoResults($this->getAnalyticsParams());
+        return isset($noResults['searches']) ? array_slice($noResults['searches'], 0, 5) : array();
     }
 
     /**

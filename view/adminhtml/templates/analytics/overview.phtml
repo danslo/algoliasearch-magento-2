@@ -1,57 +1,67 @@
 <?php /** @var $this \Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Index */ ?>
-<div class="row">
-    <div class="one-third popular-searches">
-        <div class="title">
-            <?php echo __('Popular Searches'); ?>
-        </div>
-        <div class="analytics-content">
-            <?php if (count($this->getTopSearches())): ?>
-                <table>
-                    <thead>
+<div class="algoliasearch-analytics-overview-container">
+    <div class="row clearfix">
+        // total searches
+        // Users
+        // No results rate
+    </div>
+    <div class="row clearfix">
+        // Daily Searches
+    </div>
+    <div class="row halves clearfix">
+        <div class="one-half popular-searches">
+            <div class="title">
+                <?php echo __('Popular Searches'); ?>
+            </div>
+            <div class="analytics-content">
+                <?php if (count($this->getTopSearches())): ?>
+                    <table>
+                        <thead>
                         <tr>
                             <th><?php echo __('Query') ?></th>
                             <th><?php echo __('Count') ?></th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <?php foreach ($this->getTopSearches() as $search): ?>
-                        <tr>
-                            <td><?php echo $search['search'] ?></td>
-                            <td><?php echo $search['count'] ?></td>
-                        </tr>
+                            <tr>
+                                <td><?php echo $search['search'] ?></td>
+                                <td><?php echo $search['count'] ?></td>
+                            </tr>
                         <?php endforeach ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <?php echo __('No searches yet!'); ?>
-            <?php endif ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <?php echo __('No searches yet!'); ?>
+                <?php endif ?>
+            </div>
         </div>
-    </div>
-    <div class="one-third popular-results">
-        <div class="title">
-            <?php echo __('Popular Results'); ?>
-        </div>
-        <div class="analytics-content">
-            <?php if (count($this->getTopHits())): ?>
-                <table>
-                    <thead>
-                    <tr>
-                        <th><?php echo __('Query') ?></th>
-                        <th><?php echo __('Count') ?></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($this->getTopHits() as $hit): ?>
+        <div class="one-half no-result-searches">
+            <div class="title">
+                <?php echo __('No Result Searches'); ?>
+            </div>
+            <div class="analytics-content">
+                <?php if (count($this->getNoResultSearches())): ?>
+                    <table>
+                        <thead>
                         <tr>
-                            <td><?php echo $hit['hit'] ?></td>
-                            <td><?php echo $hit['count'] ?></td>
+                            <th><?php echo __('Query') ?></th>
+                            <th><?php echo __('Count') ?></th>
                         </tr>
-                    <?php endforeach ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <?php echo __('No hits yet!'); ?>
-            <?php endif ?>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($this->getNoResultSearches() as $search): ?>
+                            <tr>
+                                <td><?php echo $search['search'] ?></td>
+                                <td><?php echo $search['count'] ?></td>
+                            </tr>
+                        <?php endforeach ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <?php echo __('No hits yet!'); ?>
+                <?php endif ?>
+            </div>
         </div>
     </div>
 </div>
