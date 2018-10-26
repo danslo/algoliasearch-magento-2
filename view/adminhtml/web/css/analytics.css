@@ -1,0 +1,10 @@
+.algolia-analytics-daterange {
+    margin-top: .7rem;
+    float: right;
+}
+.algolia-analytics-daterange .divide {
+    padding: 0 7px;
+}
+.algolia-analytics-daterange .input-text._has-datepicker {
+    width: 18rem;
+}

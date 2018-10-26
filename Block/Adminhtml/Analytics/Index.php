@@ -7,7 +7,6 @@ use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\AnalyticsHelper;
 use Algolia\AlgoliaSearch\Helper\Data;
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
-use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
 
@@ -15,9 +14,6 @@ class Index extends Template
 {
     /** @var Context */
     private $backendContext;
-
-    /** @var DateTime */
-    private $dateTime;
 
     /** @var AlgoliaHelper */
     private $algoliaHelper;
@@ -38,7 +34,6 @@ class Index extends Template
      * Index constructor.
      * @param Context $context
      * @param AlgoliaHelper $algoliaHelper
-     * @param DateTime $dateTime
      * @param ConfigHelper $configHelper
      * @param AnalyticsHelper $analyticsHelper
      * @param ProductHelper $productHelper
@@ -48,7 +43,6 @@ class Index extends Template
     public function __construct(
         Context $context,
         AlgoliaHelper $algoliaHelper,
-        DateTime $dateTime,
         ConfigHelper $configHelper,
         AnalyticsHelper $analyticsHelper,
         ProductHelper $productHelper,
@@ -58,7 +52,6 @@ class Index extends Template
         parent::__construct($context, $data);
 
         $this->backendContext = $context;
-        $this->dateTime = $dateTime;
         $this->algoliaHelper = $algoliaHelper;
         $this->configHelper = $configHelper;
         $this->dataHelper = $dataHelper;
@@ -95,6 +88,12 @@ class Index extends Template
     {
         $noResults = $this->analyticsHelper->getTopSearchesNoResults($this->getAnalyticsParams());
         return isset($noResults['searches']) ? array_slice($noResults['searches'], 0, 5) : array();
+    }
+
+    public function getDateRange()
+    {
+        /** @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface $date */
+        $localDate = $this->backendContext->getLocaleDate();
     }
 
     /**

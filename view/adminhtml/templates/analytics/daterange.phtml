@@ -1,0 +1,24 @@
+<div class="algolia-analytics-daterange">
+    <div id="algolia-analytics-daterange">
+        <input type="text" id="analytics_from" name="from" class="admin__control-text input-text date required" placeholder="<?php echo __('Start Date') ?>"/>
+        <span class="divide">-</span>
+        <input type="text" id="analytics_to" name="to" class="admin__control-text input-text date required" placeholder="<?php echo __('End Date') ?>"/>
+    </div>
+</div>
+<script type="text/javascript">
+    require(["jquery", "mage/calendar"], function($) {
+        $('#algolia-analytics-daterange').dateRange({
+            dateFormat: "d MMM Y",
+            from: {
+                id: "analytics_from"
+            },
+            to: {
+                id: "analytics_to"
+            },
+            onClose: function( selectedDate ) {
+                console.log(selectedDate);
+            }
+        });
+
+    });
+</script>
