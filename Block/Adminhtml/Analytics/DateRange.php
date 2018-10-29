@@ -23,4 +23,12 @@ class DateRange extends Template
 
         $this->setTemplate('analytics/daterange.phtml');
     }
+
+    /**
+     * @return string
+     */
+    public function getFormAction()
+    {
+        return $this->getUrl('*/*/update', ['_current' => true]);
+    }
 }

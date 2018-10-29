@@ -1,12 +1,21 @@
-<div class="algolia-analytics-daterange">
-    <div id="algolia-analytics-daterange">
-        <input type="text" id="analytics_from" name="from" class="admin__control-text input-text date required" placeholder="<?php echo __('Start Date') ?>"/>
+<?php /** @var $this Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\DateRange */ ?>
+<div class="algolia-analytics-daterange" id="algolia-analytics-daterange">
+    <form id="algolia-analytics-daterange-form" data-mage-init='{"validation":{}}' action="<?php echo $this->getFormAction() ?>"  method="post">
+        <input type="hidden" name="form_key" value="<?php echo $this->getFormKey() ?>" />
+        <div class="inline-field">
+            <input type="text" id="analytics_from" name="from" required="true" class="admin__control-text input-text validate-date-range date-range-analytics-from" placeholder="<?php echo __('Start Date') ?>"/>
+        </div>
         <span class="divide">-</span>
-        <input type="text" id="analytics_to" name="to" class="admin__control-text input-text date required" placeholder="<?php echo __('End Date') ?>"/>
-    </div>
+        <div class="inline-field">
+            <input type="text" id="analytics_to" name="to" required="true" class="admin__control-text input-text validate-date-range date-range-analytics-to" placeholder="<?php echo __('End Date') ?>"/>
+        </div>
+        <?php /* <button type="button" class="action submit primary algolia-daterange-submit" onclick="algoliaDateRangeFormSubmit(this)" data-btn-pending-text="<?php echo __('Updating...') ?>"><?php echo __('Update') ?></button> */ ?>
+        <button type="submit" class="action submit primary algolia-daterange-submit"><?php echo __('Update') ?></button>
+    </form>
 </div>
+
 <script type="text/javascript">
-    require(["jquery", "mage/calendar"], function($) {
+    require(["jquery", "mage/calendar", "mage/backend/form"], function($) {
         $('#algolia-analytics-daterange').dateRange({
             dateFormat: "d MMM Y",
             from: {
@@ -14,11 +23,33 @@
             },
             to: {
                 id: "analytics_to"
-            },
-            onClose: function( selectedDate ) {
-                console.log(selectedDate);
             }
         });
 
+        var analyticsForm = $('#algolia-analytics-daterange-form').form();
+        analyticsForm.on('submit', function(e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            if (analyticsForm.valid()) {
+                $.ajax({
+                    type: 'post',
+                    url: analyticsForm.attr('action'),
+                    data: analyticsForm.serialize(),
+                    showLoader: true,
+                    context: this,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (!response.error) {
+                            $('#container').html(response.html_content);
+                        } else {
+                            alert('An error has occurred. Please try refreshing the page and submitting again.');
+                        }
+                    }
+                });
+            }
+        });
     });
+
+
 </script>
