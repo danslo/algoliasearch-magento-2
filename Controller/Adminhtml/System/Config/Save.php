@@ -4,11 +4,9 @@ namespace Algolia\AlgoliaSearch\Controller\Adminhtml\System\Config;
 
 class Save extends \Magento\Config\Controller\Adminhtml\System\Config\Save
 {
-    /**
-     * Get groups for save
-     *
-     * @return array|null
-     */
+    private $instantSerializedValues = ['facets', 'sorts'];
+    private $autocompleteSerializedValues = ['sections', 'excluded_pages'];
+
     protected function _getGroupsForSave()
     {
         $groups = parent::_getGroupsForSave();
@@ -20,22 +18,21 @@ class Save extends \Magento\Config\Controller\Adminhtml\System\Config\Save
     {
         if (isset($groups['instant']['fields']['is_instant_enabled']['value'])
                 && $groups['instant']['fields']['is_instant_enabled']['value'] == '0') {
-            if (isset($groups['instant']['fields']['facets'])) {
-                unset($groups['instant']['fields']['facets']);
-            }
-            if (isset($groups['instant']['fields']['sorts'])) {
-                unset($groups['instant']['fields']['sorts']);
+
+            foreach ($this->instantSerializedValues as $field) {
+                if (isset($groups['instant']['fields'][$field])) {
+                    unset($groups['instant']['fields'][$field]);
+                }
             }
         }
 
         if (isset($groups['autocomplete']['fields']['is_popup_enabled']['value'])
                 && $groups['autocomplete']['fields']['is_popup_enabled']['value'] == '0') {
-            if (isset($groups['autocomplete']['fields']['sections'])) {
-                unset($groups['autocomplete']['fields']['sections']);
-            }
 
-            if (isset($groups['autocomplete']['fields']['excluded_pages'])) {
-                unset($groups['autocomplete']['fields']['excluded_pages']);
+            foreach ($this->autocompleteSerializedValues as $field) {
+                if (isset($groups['autocomplete']['fields'][$field])) {
+                    unset($groups['autocomplete']['fields'][$field]);
+                }
             }
         }
 
