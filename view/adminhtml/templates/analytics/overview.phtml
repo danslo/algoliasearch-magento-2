@@ -1,26 +1,33 @@
 <?php /** @var $this \Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Index */ ?>
-<div class="algoliasearch-analytics-overview-container">
-    <div class="row clearfix">
+<?php if (!$this->checkIsValidDateRange()): ?>
+<div class="algoliasearch-notices message message-notice notice">
+    <div class="notice">
+        <?php echo __('The selected date is out of your analytics retention window (7 days), your data might not be present anymore.'); ?>
+    </div>
+</div>
+<?php endif ?>
+<div class="algoliasearch-analytics-overview">
+    <div class="row clearfix section">
         // total searches
         // Users
         // No results rate
     </div>
-    <div class="row clearfix">
+    <div class="row clearfix section">
         // Daily Searches
     </div>
-    <div class="row halves clearfix">
-        <div class="one-half popular-searches">
+    <div class="row halves">
+        <div class="one-half section popular-searches">
             <div class="title">
-                <?php echo __('Popular Searches'); ?>
+                <h3><?php echo __('Popular Searches'); ?></h3>
             </div>
             <div class="analytics-content">
                 <?php if (count($this->getTopSearches())): ?>
-                    <table>
+                    <table class="data-table admin__table-primary">
                         <thead>
-                        <tr>
-                            <th><?php echo __('Query') ?></th>
-                            <th><?php echo __('Count') ?></th>
-                        </tr>
+                            <tr class="headings">
+                                <th><?php echo __('Query') ?></th>
+                                <th><?php echo __('Count') ?></th>
+                            </tr>
                         </thead>
                         <tbody>
                         <?php foreach ($this->getTopSearches() as $search): ?>
@@ -36,18 +43,18 @@
                 <?php endif ?>
             </div>
         </div>
-        <div class="one-half no-result-searches">
+        <div class="one-half section no-result-searches">
             <div class="title">
-                <?php echo __('No Result Searches'); ?>
+                <h3><?php echo __('No Result Searches'); ?></h3>
             </div>
             <div class="analytics-content">
                 <?php if (count($this->getNoResultSearches())): ?>
-                    <table>
+                    <table class="data-table admin__table-primary">
                         <thead>
-                        <tr>
-                            <th><?php echo __('Query') ?></th>
-                            <th><?php echo __('Count') ?></th>
-                        </tr>
+                            <tr class="headings">
+                                <th><?php echo __('Query') ?></th>
+                                <th><?php echo __('Count') ?></th>
+                            </tr>
                         </thead>
                         <tbody>
                         <?php foreach ($this->getNoResultSearches() as $search): ?>

@@ -1,3 +1,4 @@
+/** Date Range Styling */
 .algolia-analytics-daterange {
     margin-top: .7rem;
     float: right;
@@ -22,4 +23,27 @@
 
 .algolia-analytics-daterange .input-text._has-datepicker {
     width: 18rem;
+}
+
+/** Analytics Overview */
+.algoliasearch-analytics-overview .row {
+    margin-bottom: 3rem;
+}
+
+.algoliasearch-analytics-overview .row.halves {
+    display: flex;
+    justify-content: space-between;
+}
+
+.algoliasearch-analytics-overview .row.halves .one-half {
+    width: 49%;
+}
+
+.algoliasearch-analytics-overview .no-result-searches {
+    margin-left: 2%;
+}
+
+.algoliasearch-analytics-overview .section {
+    border: 1px solid #e3e3e3;
+    padding: 2rem;
 }

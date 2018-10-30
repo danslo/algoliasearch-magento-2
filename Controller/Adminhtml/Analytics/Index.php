@@ -4,7 +4,7 @@ namespace Algolia\AlgoliaSearch\Controller\Adminhtml\Analytics;
 
 use Magento\Framework\Controller\ResultFactory;
 
-class Index extends \Magento\Backend\App\Action
+class Index extends AbstractAction
 {
     /**
      * @return \Magento\Framework\View\Result\Page

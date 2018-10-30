@@ -9,10 +9,11 @@ use Algolia\AlgoliaSearch\Helper\Data;
 use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class Index extends Template
 {
-    const LIMIT_RESULTS = 5;
+    const LIMIT_RESULTS = 7;
 
     /** @var Context */
     private $backendContext;
@@ -32,6 +33,9 @@ class Index extends Template
     /** @var Product */
     private $productHelper;
 
+    /** @var TimezoneInterface  */
+    private $dateTime;
+
     /**
      * Index constructor.
      * @param Context $context
@@ -40,6 +44,7 @@ class Index extends Template
      * @param AnalyticsHelper $analyticsHelper
      * @param ProductHelper $productHelper
      * @param Data $dataHelper
+     * @param TimezoneInterface $dateTime
      * @param array $data
      */
     public function __construct(
@@ -49,6 +54,7 @@ class Index extends Template
         AnalyticsHelper $analyticsHelper,
         ProductHelper $productHelper,
         Data $dataHelper,
+        TimezoneInterface $dateTime,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -59,10 +65,12 @@ class Index extends Template
         $this->dataHelper = $dataHelper;
         $this->productHelper = $productHelper;
         $this->analyticsHelper = $analyticsHelper;
+        $this->dateTime = $dateTime;
     }
 
     /**
      * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getIndexName()
     {
@@ -72,6 +80,7 @@ class Index extends Template
     /**
      * @param array $additional
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getAnalyticsParams($additional = array())
     {
@@ -101,6 +110,25 @@ class Index extends Template
     {
         $noResults = $this->analyticsHelper->getTopSearchesNoResults($this->getAnalyticsParams());
         return isset($noResults['searches']) ? array_slice($noResults['searches'], 0, self::LIMIT_RESULTS) : array();
+    }
+
+    public function checkIsValidDateRange()
+    {
+        if ($formData = $this->_backendSession->getAlgoliaAnalyticsFormData()) {
+            if ((isset($formData['from']) && isset($formData['to']))
+                && (!empty($formData['from']) && (!empty($formData['to'])))) {
+
+                $startDate = $this->dateTime->date($formData['from']);
+                $endDate = $this->dateTime->date($formData['to']);
+
+                $diff = date_diff($startDate, $endDate);
+                if ($diff->days > 7) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
