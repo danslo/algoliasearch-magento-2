@@ -115,13 +115,10 @@ class Index extends Template
     public function checkIsValidDateRange()
     {
         if ($formData = $this->_backendSession->getAlgoliaAnalyticsFormData()) {
-            if ((isset($formData['from']) && isset($formData['to']))
-                && (!empty($formData['from']) && (!empty($formData['to'])))) {
-
+            if (isset($formData['from']) && !empty($formData['from'])) {
+                
                 $startDate = $this->dateTime->date($formData['from']);
-                $endDate = $this->dateTime->date($formData['to']);
-
-                $diff = date_diff($startDate, $endDate);
+                $diff = date_diff($startDate, $this->dateTime->date());
                 if ($diff->days > 7) {
                     return false;
                 }
