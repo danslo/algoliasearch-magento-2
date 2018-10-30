@@ -39,6 +39,8 @@ class Update extends \Magento\Backend\App\Action
         $response = $this->_objectManager->create(\Magento\Framework\DataObject::class);
         $response->setError(false);
 
+        $this->_getSession()->setAlgoliaAnalyticsFormData($this->getRequest()->getParams());
+
         $layout = $this->layoutFactory->create();
         $block = $layout->createBlock('\Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Index')
             ->setTemplate('Algolia_AlgoliaSearch::analytics/overview.phtml')

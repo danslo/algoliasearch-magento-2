@@ -3,13 +3,16 @@
     <form id="algolia-analytics-daterange-form" data-mage-init='{"validation":{}}' action="<?php echo $this->getFormAction() ?>"  method="post">
         <input type="hidden" name="form_key" value="<?php echo $this->getFormKey() ?>" />
         <div class="inline-field">
-            <input type="text" id="analytics_from" name="from" required="true" class="admin__control-text input-text validate-date-range date-range-analytics-from" placeholder="<?php echo __('Start Date') ?>"/>
+            <input type="text" id="analytics_from" name="from"
+                   class="admin__control-text input-text date-range-analytics-from"
+                   placeholder="<?php echo __('Start Date') ?>" value="<?php echo $this->getFormValue('from') ?>"/>
         </div>
         <span class="divide">-</span>
         <div class="inline-field">
-            <input type="text" id="analytics_to" name="to" required="true" class="admin__control-text input-text validate-date-range date-range-analytics-to" placeholder="<?php echo __('End Date') ?>"/>
+            <input type="text" id="analytics_to" name="to"
+                   class="admin__control-text input-text validate-date-range date-range-analytics-to"
+                   placeholder="<?php echo __('End Date') ?>" value="<?php echo $this->getFormValue('to') ?>"/>
         </div>
-        <?php /* <button type="button" class="action submit primary algolia-daterange-submit" onclick="algoliaDateRangeFormSubmit(this)" data-btn-pending-text="<?php echo __('Updating...') ?>"><?php echo __('Update') ?></button> */ ?>
         <button type="submit" class="action submit primary algolia-daterange-submit"><?php echo __('Update') ?></button>
     </form>
 </div>

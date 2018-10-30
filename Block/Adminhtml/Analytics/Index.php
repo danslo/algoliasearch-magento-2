@@ -12,6 +12,8 @@ use Magento\Backend\Block\Template\Context;
 
 class Index extends Template
 {
+    const LIMIT_RESULTS = 5;
+
     /** @var Context */
     private $backendContext;
 
@@ -73,31 +75,37 @@ class Index extends Template
      */
     public function getAnalyticsParams($additional = array())
     {
-        // add startDate and endDate optional parameters
         $params = array('index' => $this->getIndexName());
+
+        if ($formData = $this->_backendSession->getAlgoliaAnalyticsFormData()) {
+            if (isset($formData['from']) && $formData['from'] !== '') {
+                $params['startDate'] = $this->backendContext->getLocaleDate()->convertConfigTimeToUtc($formData['from'],
+                    'Y-m-d');
+            }
+            if (isset($formData['to']) && $formData['to'] !== '') {
+                $params['endDate'] = $this->backendContext->getLocaleDate()->convertConfigTimeToUtc($formData['to'],
+                    'Y-m-d');
+            }
+        }
+
         return array_merge($params, $additional);
     }
 
     public function getTopSearches()
     {
         $topSearches = $this->analyticsHelper->getTopSearches($this->getAnalyticsParams());
-        return isset($topSearches['searches']) ? array_slice($topSearches['searches'], 0, 5) : array();
+        return isset($topSearches['searches']) ? array_slice($topSearches['searches'], 0, self::LIMIT_RESULTS) : array();
     }
 
     public function getNoResultSearches()
     {
         $noResults = $this->analyticsHelper->getTopSearchesNoResults($this->getAnalyticsParams());
-        return isset($noResults['searches']) ? array_slice($noResults['searches'], 0, 5) : array();
-    }
-
-    public function getDateRange()
-    {
-        /** @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface $date */
-        $localDate = $this->backendContext->getLocaleDate();
+        return isset($noResults['searches']) ? array_slice($noResults['searches'], 0, self::LIMIT_RESULTS) : array();
     }
 
     /**
-     * @return Magento\Store\Model\StoreManagerInterface
+     * @return \Magento\Store\Api\Data\StoreInterface|null
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getStore()
     {

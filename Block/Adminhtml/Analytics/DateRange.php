@@ -10,7 +10,6 @@ class DateRange extends Template
     /**
      * DateRange constructor.
      * @param Context $context
-     * @param array $data
      */
     public function __construct(
         Context $context,
@@ -30,5 +29,16 @@ class DateRange extends Template
     public function getFormAction()
     {
         return $this->getUrl('*/*/update', ['_current' => true]);
+    }
+
+    /**
+     * @param $key
+     * @return string
+     */
+    public function getFormValue($key)
+    {
+        $formData = $this->_backendSession->getAlgoliaAnalyticsFormData();
+
+        return ($formData && isset($formData[$key])) ? $formData[$key] :  '';
     }
 }
