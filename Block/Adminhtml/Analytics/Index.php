@@ -13,7 +13,7 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class Index extends Template
 {
-    const LIMIT_RESULTS = 7;
+    const LIMIT_RESULTS = 5;
 
     /** @var Context */
     private $backendContext;
@@ -33,8 +33,13 @@ class Index extends Template
     /** @var Product */
     private $productHelper;
 
-    /** @var TimezoneInterface  */
+    /** @var TimezoneInterface */
     private $dateTime;
+
+    /** @var array  */
+    protected $_analyticsParams = array();
+
+    protected $_totalSearches;
 
     /**
      * Index constructor.
@@ -84,39 +89,75 @@ class Index extends Template
      */
     public function getAnalyticsParams($additional = array())
     {
-        $params = array('index' => $this->getIndexName());
+        if (!count($this->_analyticsParams)) {
 
-        if ($formData = $this->_backendSession->getAlgoliaAnalyticsFormData()) {
-            if (isset($formData['from']) && $formData['from'] !== '') {
-                $params['startDate'] = $this->backendContext->getLocaleDate()->convertConfigTimeToUtc($formData['from'],
-                    'Y-m-d');
+            $params = array('index' => $this->getIndexName());
+            if ($formData = $this->_backendSession->getAlgoliaAnalyticsFormData()) {
+                if (isset($formData['from']) && $formData['from'] !== '') {
+                    $params['startDate'] = $this->backendContext->getLocaleDate()->convertConfigTimeToUtc($formData['from'],
+                        'Y-m-d');
+                }
+                if (isset($formData['to']) && $formData['to'] !== '') {
+                    $params['endDate'] = $this->backendContext->getLocaleDate()->convertConfigTimeToUtc($formData['to'],
+                        'Y-m-d');
+                }
             }
-            if (isset($formData['to']) && $formData['to'] !== '') {
-                $params['endDate'] = $this->backendContext->getLocaleDate()->convertConfigTimeToUtc($formData['to'],
-                    'Y-m-d');
-            }
+
+            $this->_analyticsParams = $params;
         }
 
-        return array_merge($params, $additional);
+        return array_merge($this->_analyticsParams, $additional);
+    }
+
+    public function getTotalSearches()
+    {
+        if (!$this->_totalSearches) {
+            $this->_totalSearches = $this->analyticsHelper->getCountOfSearches($this->getAnalyticsParams());
+        }
+        return $this->_totalSearches;
+    }
+
+    public function getDateCounts()
+    {
+        $total = $this->getTotalSearches();
+        return $total && isset($total['dates']) ? $total['dates'] : array();
+    }
+
+    public function getTotalCount()
+    {
+        $total = $this->getTotalSearches();
+        return $total && isset($total['count']) ? $total['count'] : 0;
+    }
+
+    public function getUsers()
+    {
+        $analytics = $this->analyticsHelper->getUserCount($this->getAnalyticsParams());
+        return isset($analytics['count']) ? $analytics['count'] : 0;
+    }
+
+    public function getResultRate()
+    {
+        $analytics = $this->analyticsHelper->getRateOfNoResults($this->getAnalyticsParams());
+        return isset($analytics['rate']) ? round($analytics['rate'] * 100) . '%' : 0;
     }
 
     public function getTopSearches()
     {
-        $topSearches = $this->analyticsHelper->getTopSearches($this->getAnalyticsParams());
-        return isset($topSearches['searches']) ? array_slice($topSearches['searches'], 0, self::LIMIT_RESULTS) : array();
+        $topSearches = $this->analyticsHelper->getTopSearches($this->getAnalyticsParams(array('limit' => self::LIMIT_RESULTS)));
+        return isset($topSearches['searches']) ? $topSearches['searches'] : array();
     }
 
     public function getNoResultSearches()
     {
-        $noResults = $this->analyticsHelper->getTopSearchesNoResults($this->getAnalyticsParams());
-        return isset($noResults['searches']) ? array_slice($noResults['searches'], 0, self::LIMIT_RESULTS) : array();
+        $noResults = $this->analyticsHelper->getTopSearchesNoResults($this->getAnalyticsParams(array('limit' => self::LIMIT_RESULTS)));
+        return isset($noResults['searches']) ? $noResults['searches'] : array();
     }
 
     public function checkIsValidDateRange()
     {
         if ($formData = $this->_backendSession->getAlgoliaAnalyticsFormData()) {
             if (isset($formData['from']) && !empty($formData['from'])) {
-                
+
                 $startDate = $this->dateTime->date($formData['from']);
                 $diff = date_diff($startDate, $this->dateTime->date());
                 if ($diff->days > 7) {

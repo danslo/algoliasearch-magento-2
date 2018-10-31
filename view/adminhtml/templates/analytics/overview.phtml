@@ -7,18 +7,36 @@
 </div>
 <?php endif ?>
 <div class="algoliasearch-analytics-overview">
-    <div class="row clearfix section">
-        // total searches
-        // Users
-        // No results rate
+    <div class="row thirds clearfix section">
+        <div class="one-third col-1">
+            <h4><?php echo __('Total Searches') ?></h4>
+            <span class="stat"><?php echo $this->getTotalCount() ?></span>
+        </div>
+        <div class="one-third col-2">
+            <h4><?php echo __('Users') ?></h4>
+            <span class="stat"><?php echo $this->getUsers() ?></span>
+        </div>
+        <div class="one-third col-3">
+            <h4><?php echo __('No Results Rate') ?></h4>
+            <span class="stat"><?php echo $this->getResultRate() ?></span>
+        </div>
     </div>
-    <div class="row clearfix section">
-        // Daily Searches
+    <div class="row clearfix section daily-search-section">
+        <div class="title">
+            <h3><?php echo __('Daily Searches') ?></h3>
+            <div class="total-search"><?php echo __('Total Searches') ?> <span class="count"><?php echo $this->getTotalCount() ?></span></div>
+        </div>
+        <?php $dateCounts = $this->getDateCounts(); ?>
+        <?php if (count($dateCounts)): ?>
+            <?php foreach ($dateCounts as $daily): ?>
+                <div><?php echo $daily['date'] .': '. $daily['count'] ?></div>
+            <?php endforeach ?>
+        <?php endif ?>
     </div>
     <div class="row halves">
         <div class="one-half section popular-searches">
             <div class="title">
-                <h3><?php echo __('Popular Searches'); ?></h3>
+                <h3><?php echo __('Popular Searches') ?></h3>
             </div>
             <div class="analytics-content">
                 <?php if (count($this->getTopSearches())): ?>
@@ -45,7 +63,7 @@
         </div>
         <div class="one-half section no-result-searches">
             <div class="title">
-                <h3><?php echo __('No Result Searches'); ?></h3>
+                <h3><?php echo __('No Result Searches') ?></h3>
             </div>
             <div class="analytics-content">
                 <?php if (count($this->getNoResultSearches())): ?>
