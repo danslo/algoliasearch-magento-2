@@ -2,7 +2,6 @@
 
 namespace Algolia\AlgoliaSearch\Block\Adminhtml\Analytics;
 
-use Algolia\AlgoliaSearch\Helper\AlgoliaHelper;
 use Algolia\AlgoliaSearch\Helper\ConfigHelper;
 use Algolia\AlgoliaSearch\Helper\AnalyticsHelper;
 use Algolia\AlgoliaSearch\Helper\Data;
@@ -12,6 +11,7 @@ use Algolia\AlgoliaSearch\Helper\Entity\PageHelper;
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class Index extends Template
 {
@@ -20,9 +20,6 @@ class Index extends Template
 
     /** @var Context */
     private $backendContext;
-
-    /** @var AlgoliaHelper */
-    private $algoliaHelper;
 
     /** @var ConfigHelper */
     private $configHelper;
@@ -37,13 +34,16 @@ class Index extends Template
     private $productHelper;
 
     /** @var CategoryHelper */
-    protected $categoryHelper;
+    private $categoryHelper;
 
     /** @var PageHelper */
-    protected $pageHelper;
+    private $pageHelper;
 
     /** @var TimezoneInterface */
     private $dateTime;
+
+    /** @var CollectionFactory */
+    private $productCollection;
 
     protected $_analyticsParams = array();
 
@@ -67,7 +67,6 @@ class Index extends Template
      */
     public function __construct(
         Context $context,
-        AlgoliaHelper $algoliaHelper,
         ConfigHelper $configHelper,
         AnalyticsHelper $analyticsHelper,
         ProductHelper $productHelper,
@@ -75,12 +74,12 @@ class Index extends Template
         PageHelper $pageHelper,
         Data $dataHelper,
         TimezoneInterface $dateTime,
+        CollectionFactory $productCollection,
         array $data = []
     ) {
         parent::__construct($context, $data);
 
         $this->backendContext = $context;
-        $this->algoliaHelper = $algoliaHelper;
         $this->configHelper = $configHelper;
         $this->dataHelper = $dataHelper;
         $this->productHelper = $productHelper;
@@ -88,6 +87,7 @@ class Index extends Template
         $this->pageHelper = $pageHelper;
         $this->analyticsHelper = $analyticsHelper;
         $this->dateTime = $dateTime;
+        $this->productCollection = $productCollection;
     }
 
     /**
@@ -234,21 +234,22 @@ class Index extends Template
         $popular = $this->analyticsHelper->getTopHits($this->getAnalyticsParams(array('limit' => self::LIMIT_RESULTS)));
         $hits = isset($popular['hits']) ? $popular['hits'] : array();
 
-        // Maybe pull Magento product Collection? This seems to be an expensive call
-        /* if (count($hits)) {
+        if (count($hits)) {
             $objectIds = array_map(function($arr) {
                 return $arr['hit'];
             }, $hits);
 
-            $objects = $this->algoliaHelper->getObjects($this->getIndexName(), $objectIds);
-            foreach ($hits as &$hit) {
-                foreach ($objects['results'] as $object) {
-                    if ($object['objectID'] == $hit['hit']) {
-                        $hit['object'] = $object;
-                    }
+            if ($this->getCurrentType() == 'products') {
+                $collection = $this->productCollection->create();
+                $collection->addAttributeToSelect('name');
+                $collection->addAttributeToFilter('entity_id', array('in' => $objectIds));
+
+                foreach ($hits as &$hit) {
+                    $item = $collection->getItemById($hit['hit']);
+                    $hit['name'] = $item->getName();
                 }
             }
-        } */
+        }
 
         return $hits;
     }

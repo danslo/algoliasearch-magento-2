@@ -75,9 +75,9 @@
                         <?php foreach ($this->getPopularResults() as $search): ?>
                             <tr>
                                 <td>
-                                    <?php if (isset($search['object'])): ?>
-                                        <a href="<?php echo $this->getTypeEditUrl($search['object']['objectID']) ?>">
-                                            <?php echo $search['object']['name'] ?>
+                                    <?php if (isset($search['name'])): ?>
+                                        <a href="<?php echo $this->getTypeEditUrl($search['hit']) ?>">
+                                            <?php echo $search['name'] ?>
                                         </a>
                                     <?php else: ?>
                                         <?php echo $search['hit']; ?>
