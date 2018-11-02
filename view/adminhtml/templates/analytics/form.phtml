@@ -1,7 +1,14 @@
-<?php /** @var $this Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\DateRange */ ?>
-<div class="algolia-analytics-daterange" id="algolia-analytics-daterange">
-    <form id="algolia-analytics-daterange-form" data-mage-init='{"validation":{}}' action="<?php echo $this->getFormAction() ?>"  method="post">
+<?php /** @var $this Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Form */ ?>
+<div class="algolia-analytics-form" id="algolia-analytics-daterange">
+    <form id="algolia-analytics-form" data-mage-init='{"validation":{}}' action="<?php echo $this->getFormAction() ?>"  method="post">
         <input type="hidden" name="form_key" value="<?php echo $this->getFormKey() ?>" />
+        <div class="inline-field">
+            <select name="type" class="select admin__control-select">
+                <?php foreach ($this->getSections() as $key => $section): ?>
+                    <option value="<?php echo $key ?>" <?php if ($key == $this->getFormValue('type')): ?>selected<?php endif ?>><?php echo ucwords($key) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
         <div class="inline-field">
             <input type="text" id="analytics_from" name="from"
                    class="admin__control-text input-text date-range-analytics-from"
@@ -18,8 +25,8 @@
 </div>
 
 <script type="text/javascript">
-    require(["jquery", "mage/calendar", "mage/backend/form"], function($) {
-        $('#algolia-analytics-daterange').dateRange({
+    require(["jquery", "mage/calendar", "mage/backend/form", 'mage/tooltip'], function($) {
+        $('#algolia-analytics-form').dateRange({
             dateFormat: "d MMM Y",
             from: {
                 id: "analytics_from"
@@ -29,7 +36,7 @@
             }
         });
 
-        var analyticsForm = $('#algolia-analytics-daterange-form').form();
+        var analyticsForm = $('#algolia-analytics-form').form();
         analyticsForm.on('submit', function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();

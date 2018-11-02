@@ -7,34 +7,31 @@
 </div>
 <?php endif ?>
 <div class="algoliasearch-analytics-overview">
+    <div class="row section">
+        <strong><?php echo __('Viewing index:'); ?></strong> <?php echo $this->getIndexName() ?>
+    </div>
     <div class="row thirds clearfix section">
         <div class="one-third col-1">
-            <h4><?php echo __('Total Searches') ?></h4>
-            <span class="stat"><?php echo $this->getTotalCount() ?></span>
+            <div class="title">
+                <h4><?php echo __('Total Searches') ?></h4>
+                <span class="analytics-tooltip">
+                    <a href="#" class="tooltip-toggle">Hover?</a>
+                    <span class="tooltip-content">Details here</span>
+                </span>
+            </div>
+            <span class="stat"><?php echo $this->getTotalCountOfSearches() ?></span>
         </div>
         <div class="one-third col-2">
             <h4><?php echo __('Users') ?></h4>
-            <span class="stat"><?php echo $this->getUsers() ?></span>
+            <span class="stat"><?php echo $this->getTotalUsersCount() ?></span>
         </div>
         <div class="one-third col-3">
             <h4><?php echo __('No Results Rate') ?></h4>
-            <span class="stat"><?php echo $this->getResultRate() ?></span>
+            <span class="stat"><?php echo $this->getTotalResultRates() ?></span>
         </div>
     </div>
-    <div class="row clearfix section daily-search-section">
-        <div class="title">
-            <h3><?php echo __('Daily Searches') ?></h3>
-            <div class="total-search"><?php echo __('Total Searches') ?> <span class="count"><?php echo $this->getTotalCount() ?></span></div>
-        </div>
-        <?php $dateCounts = $this->getDateCounts(); ?>
-        <?php if (count($dateCounts)): ?>
-            <?php foreach ($dateCounts as $daily): ?>
-                <div><?php echo $daily['date'] .': '. $daily['count'] ?></div>
-            <?php endforeach ?>
-        <?php endif ?>
-    </div>
-    <div class="row halves">
-        <div class="one-half section popular-searches">
+    <div class="row thirds analytics-searches">
+        <div class="one-third section popular-searches">
             <div class="title">
                 <h3><?php echo __('Popular Searches') ?></h3>
             </div>
@@ -61,7 +58,42 @@
                 <?php endif ?>
             </div>
         </div>
-        <div class="one-half section no-result-searches">
+        <div class="one-third section no-result-searches">
+            <div class="title">
+                <h3><?php echo __('Popular Results') ?></h3>
+            </div>
+            <div class="analytics-content">
+                <?php if (count($this->getPopularResults())): ?>
+                    <table class="data-table admin__table-primary">
+                        <thead>
+                        <tr class="headings">
+                            <th><?php echo __('Results (Object ID)') ?></th>
+                            <th class="a-right"><?php echo __('Impressions') ?></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($this->getPopularResults() as $search): ?>
+                            <tr>
+                                <td>
+                                    <?php if (isset($search['object'])): ?>
+                                        <a href="<?php echo $this->getTypeEditUrl($search['object']['objectID']) ?>">
+                                            <?php echo $search['object']['name'] ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <?php echo $search['hit']; ?>
+                                    <?php endif ?>
+                                </td>
+                                <td class="a-right"><?php echo $search['count'] ?></td>
+                            </tr>
+                        <?php endforeach ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <?php echo __('No results yet!'); ?>
+                <?php endif ?>
+            </div>
+        </div>
+        <div class="one-third section no-result-searches">
             <div class="title">
                 <h3><?php echo __('No Result Searches') ?></h3>
             </div>
@@ -71,22 +103,49 @@
                         <thead>
                             <tr class="headings">
                                 <th><?php echo __('Query') ?></th>
-                                <th><?php echo __('Count') ?></th>
+                                <th class="a-right"><?php echo __('Count') ?></th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php foreach ($this->getNoResultSearches() as $search): ?>
                             <tr>
                                 <td><?php echo $search['search'] ?></td>
-                                <td><?php echo $search['count'] ?></td>
+                                <td class="a-right"><?php echo $search['count'] ?></td>
                             </tr>
                         <?php endforeach ?>
                         </tbody>
                     </table>
                 <?php else: ?>
-                    <?php echo __('No hits yet!'); ?>
+                    <?php echo __('No results yet!'); ?>
                 <?php endif ?>
             </div>
         </div>
+    </div>
+    <div class="row clearfix section daily-search-section">
+        <div class="title">
+            <h3><?php echo __('Daily Searches') ?></h3>
+            <div class="total-search"><?php echo __('Total Searches') ?> <span class="count"><?php echo $this->getTotalCountOfSearches() ?></span></div>
+        </div>
+        <?php $dateCounts = $this->getDailySearchData(); ?>
+        <table class="data-table admin__table-primary">
+            <thead>
+                <tr class="headings">
+                    <th><?php echo __('Date') ?></th>
+                    <th class="a-center"><?php echo __('Searches') ?></th>
+                    <th class="a-center"><?php echo __('Users') ?></th>
+                    <th><?php echo __('No Result Rate') ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($dateCounts as $daily): ?>
+                    <tr>
+                        <td><?php echo $daily['date'] ?></td>
+                        <td class="a-center"><?php echo $daily['count'] ?></td>
+                        <td class="a-center"><?php echo $daily['users'] ?></td>
+                        <td><?php echo $daily['rate'] ?></td>
+                    </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
     </div>
 </div>
