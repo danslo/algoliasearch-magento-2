@@ -1,6 +1,6 @@
 <?php
 
-namespace Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Diagrams;
+namespace Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Ui;
 
 class Searches extends \Magento\Backend\Block\Template
 {
@@ -16,7 +16,7 @@ class Searches extends \Magento\Backend\Block\Template
         array $data = []
     ) {
         parent::__construct($context, $data);
-        $this->setTemplate('Algolia_AlgoliaSearch::analytics/diagrams/graph.phtml');
+        $this->setTemplate('Algolia_AlgoliaSearch::analytics/ui/graph.phtml');
     }
 
     public function setAnalytics($analytics)

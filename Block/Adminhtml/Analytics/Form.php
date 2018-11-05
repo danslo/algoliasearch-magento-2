@@ -21,7 +21,8 @@ class Form extends Index
     public function getFormValue($key)
     {
         $formData = $this->_backendSession->getAlgoliaAnalyticsFormData();
-        if (!isset($formData['to']) && !isset($formData['from'])) {
+        if ((!isset($formData['to']) && !isset($formData['from']))
+            || ($formData['to'] == '' && $formData['from'] == '')) {
             $formData['to'] = date('d M Y', time());
             $formData['from'] = date('d M Y', strtotime("-7 day"));
         }

@@ -1,4 +1,4 @@
-<?php /** @var $block Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Diagrams\Searches */ ?>
+<?php /** @var $this Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Diagrams\Searches */ ?>
 <?php if (count($this->getAnalytics())): ?>
 <div id="algolia-analyatics-diagram"></div>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -19,7 +19,10 @@
                 subtitle: 'Searches, Users, and No Result Rates',
             },
             tooltip: {isHtml: true},
-            colors: ['#5468ff', '#3a46a1', '#3ab2bd']
+            colors: ['#5468ff', '#3a46a1', '#3ab2bd'],
+            hAxis: {
+                minValue: 0
+            }
         };
 
         var chart = new google.charts.Bar(document.getElementById('algolia-analyatics-diagram'));

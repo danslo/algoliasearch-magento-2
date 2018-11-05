@@ -315,13 +315,26 @@ class Index extends Template
     }
 
     /**
- * @return string
- * @throws \Magento\Framework\Exception\LocalizedException
- */
-    public function getDailyChart()
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getDailyChartHtml()
     {
-        $block = $this->getLayout()->createBlock(\Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Diagrams\Searches::class);
+        $block = $this->getLayout()->createBlock(\Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Ui\Searches::class);
         $block->setAnalytics($this->getDailySearchData());
+        return $block->toHtml();
+    }
+
+    /**
+     * @param $message
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getTooltipHtml($message)
+    {
+        $block = $this->getLayout()->createBlock(\Magento\Backend\Block\Template::class);
+        $block->setTemplate('Algolia_AlgoliaSearch::analytics/ui/tooltips.phtml');
+        $block->setData('message', $message);
         return $block->toHtml();
     }
 
