@@ -14,10 +14,6 @@
         <div class="one-third col-1">
             <div class="title">
                 <h4><?php echo __('Total Searches') ?></h4>
-                <span class="analytics-tooltip">
-                    <a href="#" class="tooltip-toggle">Hover?</a>
-                    <span class="tooltip-content">Details here</span>
-                </span>
             </div>
             <span class="stat"><?php echo $this->getTotalCountOfSearches() ?></span>
         </div>
@@ -29,6 +25,13 @@
             <h4><?php echo __('No Results Rate') ?></h4>
             <span class="stat"><?php echo $this->getTotalResultRates() ?></span>
         </div>
+    </div>
+    <div class="row clearfix section daily-search-section">
+        <div class="title">
+            <h3><?php echo __('Daily Searches') ?></h3>
+            <div class="total-search"><?php echo __('Total Searches') ?> <span class="count"><?php echo $this->getTotalCountOfSearches() ?></span></div>
+        </div>
+        <?php echo $this->getDailyChart(); ?>
     </div>
     <div class="row thirds analytics-searches">
         <div class="one-third section popular-searches">
@@ -67,7 +70,7 @@
                     <table class="data-table admin__table-primary">
                         <thead>
                         <tr class="headings">
-                            <th><?php echo __('Results (Object ID)') ?></th>
+                            <th><?php echo __('Results') ?></th>
                             <th class="a-right"><?php echo __('Impressions') ?></th>
                         </tr>
                         </thead>
@@ -120,32 +123,5 @@
                 <?php endif ?>
             </div>
         </div>
-    </div>
-    <div class="row clearfix section daily-search-section">
-        <div class="title">
-            <h3><?php echo __('Daily Searches') ?></h3>
-            <div class="total-search"><?php echo __('Total Searches') ?> <span class="count"><?php echo $this->getTotalCountOfSearches() ?></span></div>
-        </div>
-        <?php $dateCounts = $this->getDailySearchData(); ?>
-        <table class="data-table admin__table-primary">
-            <thead>
-                <tr class="headings">
-                    <th><?php echo __('Date') ?></th>
-                    <th class="a-center"><?php echo __('Searches') ?></th>
-                    <th class="a-center"><?php echo __('Users') ?></th>
-                    <th><?php echo __('No Result Rate') ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($dateCounts as $daily): ?>
-                    <tr>
-                        <td><?php echo $daily['date'] ?></td>
-                        <td class="a-center"><?php echo $daily['count'] ?></td>
-                        <td class="a-center"><?php echo $daily['users'] ?></td>
-                        <td><?php echo $daily['rate'] ?></td>
-                    </tr>
-                <?php endforeach ?>
-            </tbody>
-        </table>
     </div>
 </div>

@@ -55,7 +55,6 @@ class Index extends Template
     /**
      * Index constructor.
      * @param Context $context
-     * @param AlgoliaHelper $algoliaHelper
      * @param ConfigHelper $configHelper
      * @param AnalyticsHelper $analyticsHelper
      * @param ProductHelper $productHelper
@@ -63,6 +62,7 @@ class Index extends Template
      * @param PageHelper $pageHelper
      * @param Data $dataHelper
      * @param TimezoneInterface $dateTime
+     * @param CollectionFactory $productCollection
      * @param array $data
      */
     public function __construct(
@@ -196,6 +196,9 @@ class Index extends Template
         foreach ($searches as &$search) {
             $search['users'] = $this->getDateValue($users, $search['date'], 'count');
             $search['rate'] = $this->getDateValue($rates, $search['date'], 'rate');
+
+            $date = $this->dateTime->date($search['date']);
+            $search['formatted'] = date('M, d', $date->getTimestamp());
         }
 
         return $searches;
@@ -213,9 +216,6 @@ class Index extends Template
         foreach ($array as $item) {
             if ($item['date'] === $date) {
                 $value = $item[$valueKey];
-                if ($valueKey == 'rate') {
-                    $value = round($value * 100, 2) . '%';
-                }
                 break;
             }
         }
@@ -257,7 +257,7 @@ class Index extends Template
     public function getNoResultSearches()
     {
         $noResults = $this->analyticsHelper->getTopSearchesNoResults($this->getAnalyticsParams(array('limit' => self::LIMIT_RESULTS)));
-        return isset($noResults['searches']) ? $noResults['searches'] : array();
+        return $noResults && isset($noResults['searches']) ? $noResults['searches'] : array();
     }
 
     public function checkIsValidDateRange()
@@ -294,7 +294,7 @@ class Index extends Template
     {
         return $sections = array(
             'products' => $this->dataHelper->getIndexName($this->productHelper->getIndexNameSuffix(), $this->getStore()->getId()),
-            // 'categories' => $this->dataHelper->getIndexName($this->categoryHelper->getIndexNameSuffix(), $this->getStore()->getId()),
+            'categories' => $this->dataHelper->getIndexName($this->categoryHelper->getIndexNameSuffix(), $this->getStore()->getId()),
             'pages' => $this->dataHelper->getIndexName($this->pageHelper->getIndexNameSuffix(), $this->getStore()->getId())
         );
     }
@@ -305,9 +305,24 @@ class Index extends Template
             return $this->getUrl('catalog/product/edit', array('id' => $objectId));
         }
 
+        if ($this->getCurrentType() == 'categories') {
+            return $this->getUrl('catalog/category/edit', array('id' => $objectId));
+        }
+
         if ($this->getCurrentType() == 'pages') {
             return $this->getUrl('cms/page/edit', array('page_id' => $objectId));
         }
+    }
+
+    /**
+ * @return string
+ * @throws \Magento\Framework\Exception\LocalizedException
+ */
+    public function getDailyChart()
+    {
+        $block = $this->getLayout()->createBlock(\Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Diagrams\Searches::class);
+        $block->setAnalytics($this->getDailySearchData());
+        return $block->toHtml();
     }
 
     /**
