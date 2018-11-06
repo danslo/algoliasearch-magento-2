@@ -3,14 +3,19 @@
 <div id="algolia-analyatics-diagram"></div>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
-    google.charts.load('current', {packages: ['corechart', 'bar']});
+    google.charts.load("current", {packages:['corechart']});
     google.charts.setOnLoadCallback(drawChart);
-
     function drawChart() {
+
         var data = new google.visualization.arrayToDataTable([
-            ['Date', 'Searches', 'Users', 'No Results Rate'],
+            ['Date', 'Searches', {type: 'string', role: 'tooltip', p: {'html': true}}],
             <?php foreach ($this->getAnalytics() as $item): ?>
-                ['<?php echo $item['formatted'] ?>', <?php echo $item['count'] ?>, <?php echo $item['users'] ?>, <?php echo $item['rate'] ?>],
+            ['<?php echo $item['formatted'] ?>', <?php echo $item['count'] ?>,
+                "<div style='padding: 1.5rem; line-height: 18px;'><strong style='font-size: 14px;'><?php echo $item['formatted'] ?></strong><br/><br/>" +
+                "<p>Searches: <br/><strong style='color: #5468ff; font-size: 16px;'><?php echo $item['count'] ?></strong></p>" +
+                "<p>Users: <br/><strong style='color: #3a46a1; font-size: 16px;'><?php echo $item['users'] ?></strong></p>" +
+                "<p>No Result Rating: <br/><strong style='color: #3ab2bd; font-size: 16px;'><?php echo round($item['rate'] * 100, 2) . '%' ?></strong></p></div>"
+            ],
             <?php endforeach ?>
         ]);
 
@@ -18,15 +23,29 @@
             chart: {
                 subtitle: 'Searches, Users, and No Result Rates',
             },
-            tooltip: {isHtml: true},
             colors: ['#5468ff', '#3a46a1', '#3ab2bd'],
             hAxis: {
-                minValue: 0
-            }
+                baselineColor: 'grey',
+                textStyle: {
+                    color: 'grey'
+                }
+            },
+            vAxis: {
+                baselineColor: 'grey',
+                minValue: 0,
+                textStyle: {
+                    color: 'grey'
+                }
+            },
+            legend: {position: 'none'},
+            tooltip: {isHtml: true},
+            fontSize: 12,
+            fontName: 'Open Sans'
         };
 
-        var chart = new google.charts.Bar(document.getElementById('algolia-analyatics-diagram'));
-        chart.draw(data, google.charts.Bar.convertOptions(options));
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('algolia-analyatics-diagram'));
+        chart.draw(data, options);
     }
 </script>
 <?php else: ?>

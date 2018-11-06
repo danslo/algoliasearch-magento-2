@@ -12,6 +12,11 @@ class AnalyticsHelper extends Analytics
     const ANALYTICS_HITS_PATH = '/2/hits';
     const ANALTYICS_FILTER_PATH = '/2/filters';
 
+    /** Cache variables to prevent excessive calls */
+    protected $_searches;
+    protected $_users;
+    protected $_rateOfNoResults;
+
     /** @var \Algolia\AlgoliaSearch\Helper\AlgoliaHelper */
     private $algoliaHelper;
 
@@ -40,7 +45,22 @@ class AnalyticsHelper extends Analytics
 
     public function getCountOfSearches(array $params)
     {
-        return $this->fetch(self::ANALYTICS_SEARCH_PATH . '/count', $params);
+        if (!$this->_searches) {
+            $this->_searches = $this->fetch(self::ANALYTICS_SEARCH_PATH . '/count', $params);
+        }
+        return $this->_searches;
+    }
+
+    public function getTotalCountOfSearches(array $params)
+    {
+        $searches = $this->getCountOfSearches($params);
+        return $searches && isset($searches['count']) ? $searches['count'] : 0;
+    }
+
+    public function getSearchesByDates(array $params)
+    {
+        $searches = $this->getCountOfSearches($params);
+        return $searches && isset($searches['dates']) ? $searches['dates'] : array();
     }
 
     public function getTopSearchesNoResults(array $params)
@@ -50,7 +70,22 @@ class AnalyticsHelper extends Analytics
 
     public function getRateOfNoResults(array $params)
     {
-        return $this->fetch(self::ANALYTICS_SEARCH_PATH . '/noResultRate', $params);
+        if (!$this->_rateOfNoResults) {
+            $this->_rateOfNoResults = $this->fetch(self::ANALYTICS_SEARCH_PATH . '/noResultRate', $params);
+        }
+        return $this->_rateOfNoResults;
+    }
+
+    public function getTotalResultRates(array $params)
+    {
+        $result = $this->getRateOfNoResults($params);
+        return $result && isset($result['rate']) ? round($result['rate'] * 100, 2) . '%' : 0;
+    }
+
+    public function getResultRateByDates(array $params)
+    {
+        $result = $this->getRateOfNoResults($params);
+        return $result && isset($result['dates']) ? $result['dates'] : array();
     }
 
     /**
@@ -75,9 +110,24 @@ class AnalyticsHelper extends Analytics
      * @param array $params
      * @return mixed
      */
-    public function getUserCount(array $params)
+    public function getUsers(array $params)
     {
-        return $this->fetch('/2/users/count', $params);
+        if (!$this->_users) {
+            $this->_users = $this->fetch('/2/users/count', $params);
+        }
+        return $this->_users;
+    }
+
+    public function getTotalUsersCount(array $params)
+    {
+        $users = $this->getUsers($params);
+        return $users && isset($users['count']) ? $users['count'] : 0;
+    }
+
+    public function getUsersCountByDates(array $params)
+    {
+        $users = $this->getUsers($params);
+        return $users && isset($users['dates']) ? $users['dates'] : array();
     }
 
     /**

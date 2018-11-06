@@ -47,11 +47,6 @@ class Index extends Template
 
     protected $_analyticsParams = array();
 
-    /** Cache variables to prevent excessive calls */
-    protected $_searches;
-    protected $_users;
-    protected $_rateOfNoResults;
-
     /**
      * Index constructor.
      * @param Context $context
@@ -127,66 +122,39 @@ class Index extends Template
         return array_merge($this->_analyticsParams, $additional);
     }
 
-    public function getSearches()
-    {
-        if (!$this->_searches) {
-            $this->_searches = $this->analyticsHelper->getCountOfSearches($this->getAnalyticsParams());
-        }
-        return $this->_searches;
-    }
-
     public function getTotalCountOfSearches()
     {
-        $searches = $this->getSearches();
-        return $searches && isset($searches['count']) ? $searches['count'] : 0;
+        return $this->analyticsHelper->getTotalCountOfSearches($this->getAnalyticsParams());
     }
 
     public function getSearchesByDates()
     {
-        $searches = $this->getSearches();
-        return $searches && isset($searches['dates']) ? $searches['dates'] : array();
-    }
-
-    public function getUsers()
-    {
-        if (!$this->_users) {
-            $this->_users = $this->analyticsHelper->getUserCount($this->getAnalyticsParams());
-        }
-        return $this->_users;
+        return $this->analyticsHelper->getSearchesByDates($this->getAnalyticsParams());
     }
 
     public function getTotalUsersCount()
     {
-        $users = $this->getUsers();
-        return $users && isset($users['count']) ? $users['count'] : 0;
+        return $this->analyticsHelper->getTotalUsersCount($this->getAnalyticsParams());
     }
 
     public function getUsersCountByDates()
     {
-        $users = $this->getUsers();
-        return $users && isset($users['dates']) ? $users['dates'] : array();
-    }
-
-    public function getRateOfNoResults()
-    {
-        if (!$this->_rateOfNoResults) {
-            $this->_rateOfNoResults = $this->analyticsHelper->getRateOfNoResults($this->getAnalyticsParams());
-        }
-        return $this->_rateOfNoResults;
+        return $this->analyticsHelper->getUsersCountByDates($this->getAnalyticsParams());
     }
 
     public function getTotalResultRates()
     {
-        $result = $this->getRateOfNoResults();
-        return $result && isset($result['rate']) ? round($result['rate'] * 100, 2) . '%' : 0;
+        return $this->analyticsHelper->getTotalResultRates($this->getAnalyticsParams());
     }
 
     public function getResultRateByDates()
     {
-        $result = $this->getRateOfNoResults();
-        return $result && isset($result['dates']) ? $result['dates'] : array();
+        return $this->analyticsHelper->getResultRateByDates($this->getAnalyticsParams());
     }
 
+    /**
+     * Get aggregated Daily data from three separate calls
+     */
     public function getDailySearchData()
     {
         $searches = $this->getSearchesByDates();
@@ -221,7 +189,6 @@ class Index extends Template
         }
         return $value;
     }
-
 
     public function getTopSearches()
     {
