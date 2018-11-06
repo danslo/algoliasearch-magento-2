@@ -81,6 +81,10 @@
 .algoliasearch-analytics-overview .admin__field-tooltip .admin__field-tooltip-action {
     margin-left: 1rem;
 }
+.algoliasearch-analytics-overview .admin__field-tooltip .admin__field-tooltip-action:before {
+    color: #3ab2bd;
+    opacity: .5;
+}
 
 .algoliasearch-analytics-overview .admin__field-tooltip .admin__field-tooltip-content {
     background: #fff;
@@ -112,6 +116,7 @@
 .algoliasearch-analytics-overview .no-data {
     padding: 1rem 0;
     margin: 0;
+    text-align: left;
 }
 
 .analytics-searches .title {

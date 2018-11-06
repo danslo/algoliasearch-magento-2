@@ -8,13 +8,14 @@
     function drawChart() {
 
         var data = new google.visualization.arrayToDataTable([
-            ['Date', 'Searches', {type: 'string', role: 'tooltip', p: {'html': true}}],
+            ['Date', 'Searches', {type: 'string', role: 'tooltip', p: {'html': true}}, {role: 'style'}],
             <?php foreach ($this->getAnalytics() as $item): ?>
             ['<?php echo $item['formatted'] ?>', <?php echo $item['count'] ?>,
                 "<div style='padding: 1.5rem; line-height: 18px;'><strong style='font-size: 14px;'><?php echo $item['formatted'] ?></strong><br/><br/>" +
                 "<p>Searches: <br/><strong style='color: #5468ff; font-size: 16px;'><?php echo $item['count'] ?></strong></p>" +
                 "<p>Users: <br/><strong style='color: #3a46a1; font-size: 16px;'><?php echo $item['users'] ?></strong></p>" +
-                "<p>No Result Rating: <br/><strong style='color: #3ab2bd; font-size: 16px;'><?php echo round($item['rate'] * 100, 2) . '%' ?></strong></p></div>"
+                "<p>No Result Rating: <br/><strong style='color: #3ab2bd; font-size: 16px;'><?php echo round($item['rate'] * 100, 2) . '%' ?></strong></p></div>",
+                'stroke-opacity: 0; fill-opacity: 0.75;'
             ],
             <?php endforeach ?>
         ]);
@@ -42,7 +43,6 @@
             fontSize: 12,
             fontName: 'Open Sans'
         };
-
 
         var chart = new google.visualization.ColumnChart(document.getElementById('algolia-analyatics-diagram'));
         chart.draw(data, options);
