@@ -287,8 +287,9 @@ class Index extends Template
      */
     public function getDailyChartHtml()
     {
-        $block = $this->getLayout()->createBlock(\Algolia\AlgoliaSearch\Block\Adminhtml\Analytics\Ui\Searches::class);
-        $block->setAnalytics($this->getDailySearchData());
+        $block = $this->getLayout()->createBlock(\Magento\Backend\Block\Template::class);
+        $block->setTemplate('Algolia_AlgoliaSearch::analytics/ui/graph.phtml');
+        $block->setData('analytics', $this->getDailySearchData());
         return $block->toHtml();
     }
 
