@@ -1,0 +1,13 @@
+.legacy_version {
+	display: none;
+}
+
+.ais-search-box {
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.search_results {
+	width: 49%;
+	float: left;
+}
