@@ -15,7 +15,7 @@ class Index extends AbstractAction
 
         /** @var \Magento\Framework\View\Result\Page $resultPage */
         $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
-        $resultPage->getConfig()->getTitle()->prepend($breadMain);
+        $resultPage->getConfig()->getTitle()->set($breadMain);
 
         return $resultPage;
     }

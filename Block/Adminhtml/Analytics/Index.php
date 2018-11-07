@@ -107,15 +107,13 @@ class Index extends Template
             $params = array('index' => $this->getIndexName());
             if ($formData = $this->_backendSession->getAlgoliaAnalyticsFormData()) {
                 if (isset($formData['from']) && $formData['from'] !== '') {
-                    $params['startDate'] = $this->backendContext->getLocaleDate()->convertConfigTimeToUtc($formData['from'],
-                        'Y-m-d');
+                    $params['startDate'] = date('Y-m-d', $this->dateTime->date($formData['from'])->getTimestamp());
                 }
                 if (isset($formData['to']) && $formData['to'] !== '') {
-                    $params['endDate'] = $this->backendContext->getLocaleDate()->convertConfigTimeToUtc($formData['to'],
-                        'Y-m-d');
+                    $params['endDate'] = date('Y-m-d', $this->dateTime->date($formData['to'])->getTimestamp());
                 }
             }
-
+            
             $this->_analyticsParams = $params;
         }
 
